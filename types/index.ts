@@ -36,3 +36,16 @@ export interface PlayerReadDTO {
   // Puedes agregar aquí más adelante: position, rating, etc.
 }
 
+export interface PlayerUpdateDTO {
+  name: string;
+  nickname: string;
+  photoUrl: string;
+  preferredFoot: "Left" | "Right";
+  positions: number[];
+ 
+}
+
+export interface PlayerCreateDTO extends PlayerUpdateDTO {
+ age: number;
+height: number;
+}

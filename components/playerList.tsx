@@ -96,8 +96,8 @@ export default function PlayerList({ initialPlayers }: PlayerListProps) {
         </div>
 
         <div className="w-full md:w-auto flex items-center justify-end pb-1.5">
-          <Link href="/" className="inline-flex items-center cursor-pointer gap-3 bg-slate-950/60 px-4 py-2 rounded-lg border border-slate-800 select-none hover:border-slate-700 transition-colors text-slate-400 font-medium mb-1 hover:text-slate-300">
-            ⬅️ Volver al Inicio
+          <Link href="/players/new" className="inline-flex items-center cursor-pointer gap-3 bg-slate-950/60 px-4 py-2 rounded-lg border border-slate-800 select-none hover:border-slate-700 transition-colors text-slate-400 font-medium mb-1 hover:text-slate-300">
+            ➕ Nuevo Jugador
           </Link>
         </div>
       </div>

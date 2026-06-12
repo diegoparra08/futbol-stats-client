@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { PlayerReadDTO, PlayerStatsReadDTO } from "@/types";
 import { playerService } from "@/services/playerService";
+import Link from "next/dist/client/link";
 
 interface PlayerCardProps {
   player: PlayerReadDTO;
@@ -128,7 +129,7 @@ export default function PlayerCard({ player }: PlayerCardProps) {
 
       {loadingStats ? (
         <div className="text-xs text-center text-emerald-400/80 animate-pulse py-4">
-          ⚽ Consultando base de datos de .NET...
+          ⚽ Consultando base de datos...
         </div>
       ) : stats ? (
         /* Cuadrícula de recuadros ("cuadrados") adaptada para móvil (grid-cols-2) o PC (md:grid-cols-3) */
@@ -147,9 +148,17 @@ export default function PlayerCard({ player }: PlayerCardProps) {
           </div>
 
           {/* Cuadrado de Asistencias */}
-          <div className="bg-slate-950/80 border border-slate-800/40 p-2.5 rounded-lg col-span-2 md:col-span-1">
+          <div className="bg-slate-950/80 border border-slate-800/40 p-2.5 rounded-lg">
             <p className="text-slate-500 font-medium mb-0.5">Asistencias</p>
             <p className="text-sm font-bold text-slate-200">{stats.assists ?? 0}</p>
+          </div>
+
+           {/* Boton editar */}
+          <div className="bg-slate-950/80 border border-slate-800/40 p-2.5 rounded-lg hover:border-slate-700 transition-colors">           
+            <Link href={`/players/${player.id}/update`} className="text-slate-500 items-center font-medium mb-0.5 hover:text-slate-300 transition-colors">
+              Editar Perfil
+            </Link>
+            <p className="text-sm font-bold text-slate-200 hover:text-te-300 transition-colors">Datos Basicos</p>
           </div>
 
         </div>

@@ -40,7 +40,6 @@ export default function ComparePlayers() {
     try {
       // Buscamos los datos básicos que se trajo la lista al cargar el componente
       const skills = playerList.find((p) => p.id === playerId);
-      console.log("Jugador seleccionado:", skills);
       // fetch al backend traer  goles/asistencias/partidos
       const stats = await playerService.getPlayerStats(playerId);
 
