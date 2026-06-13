@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PlayerReadDTO, PlayerCreateDTO, PlayerUpdateDTO } from "@/types";
+import { API_BASE_URL } from "@/services/api";
 
 interface PlayerFormProps {
   mode: "create" | "edit";
@@ -38,20 +39,13 @@ const AVAILABLE_POSITIONS = [
 export default function PlayerForm({ mode, initialData }: PlayerFormProps) {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false); //evita que se haga doble submit mientras se procesa el primero
-  const BASE_URL = "https://localhost:7088/api/Player";
+  
+  const BASE_URL = `${API_BASE_URL}/api/Player`;
 
   const [formData, setFormData] = useState<PlayerFormData>(() => {
     //Para editar un jugador existente se debe cumplir este condicional de abajo. Si no sigue hasta el siguiente return.
     if (mode === "edit" && initialData) {
-      console.log(
-        "Inicializando formulario en modo edición con datos:",
-        initialData.positions,
-      ); ///*******ACA LLEGA BIEN LAS POSICIONES */
-
-      //const mappedPositions = (initialData.positions || []).map((pos) =>
-       // typeof pos === "string" ? parseInt(pos, 10) || 0 : pos,
-      //);
-
+     
       const mappedPositions = (initialData.positions || []).map((posLabel) => {
         // posLabel va a ser "CF", "ST", etc.
 
@@ -63,8 +57,6 @@ export default function PlayerForm({ mode, initialData }: PlayerFormProps) {
         // Si la encuentra, devuelve su id numérico (ej: 11 o 12). Si no, devuelve 0.
         return foundPosition ? foundPosition.id : 0;
       });
-
-      console.log("Posición mapeada:", mappedPositions);
       return {
         name: initialData.name || "",
         nickname: initialData.nickname || "",
@@ -131,7 +123,6 @@ export default function PlayerForm({ mode, initialData }: PlayerFormProps) {
           body: JSON.stringify(createPayload),
         });
 
-        console.log("Respuesta del servidor:", response);
         if (response.ok) router.push("/players");
       } else {
         const updatePayload: PlayerUpdateDTO = {

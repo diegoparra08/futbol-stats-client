@@ -1,6 +1,7 @@
 import PlayerForm from "@/components/playerForm";
 import { PlayerReadDTO } from "@/types";
 import Link from "next/dist/client/link";
+import {API_BASE_URL} from "@/services/api";
 
 interface ApiResponse {
   success: boolean;
@@ -19,13 +20,12 @@ export default async function EditPlayerPage({ params }: Props) {
   let playerData: PlayerReadDTO | undefined;
   
   try {
-    const response = await fetch(`https://localhost:7088/api/Player/${id}`, {
+    const response = await fetch(`${API_BASE_URL}/api/Player/${id}`, {
       cache: 'no-store' // Evitamos que Next.js cachee datos viejos si el jugador cambia
     });
     if (response.ok) {
       const result: ApiResponse = await response.json();
       playerData = result.data; // datos del jugador. luego se le pasa al form.
-      console.log("Jugador cargado para edición:", playerData); 
     }
   } catch (error) {
     console.error("Error cargando el jugador para edición:", error);
