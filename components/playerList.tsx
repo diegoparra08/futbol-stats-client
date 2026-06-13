@@ -21,16 +21,29 @@ export default function PlayerList({ initialPlayers }: PlayerListProps) {
     const fetchNewData = async () => {
       setLoading(true);
       try {
-        const datosActualizados = await playerService.getAllPlayers(includeInactive);
-        setPlayers(datosActualizados);
+        const playerList = await playerService.getAllPlayers(includeInactive);
+        setPlayers(playerList);
       } catch (error) {
         console.error("Error cargando jugadores:", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchNewData();
+    
   }, [includeInactive]);
+
+const handleUpdateData = async () => {
+
+  try {    
+    const updatedPlayerList = await playerService.getAllPlayers(includeInactive);
+    setPlayers(updatedPlayerList);
+  }
+  catch(error){
+    console.error("Error al refrescar listado desde la tarjeta:", error);
+  }
+};
 
   const filteredPlayers = players.filter((player) => {
     const matchesSearch =
@@ -115,7 +128,7 @@ export default function PlayerList({ initialPlayers }: PlayerListProps) {
         /* Lista de Jugadores limpia */
         <div className="grid gap-4 sm:grid-cols-2">
           {filteredPlayers.map((player) => (
-            <PlayerCard key={player.id} player={player} /> 
+            <PlayerCard key={player.id} player={player} onPlayerUpdated={handleUpdateData}/> 
           ))}
         </div>
       )}

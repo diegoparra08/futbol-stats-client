@@ -35,6 +35,29 @@ export const playerService = {
 
     const result: ApiResponseFormat<PlayerStatsReadDTO> = await response.json();
     return result.data;
+  },
+
+  changePlayerStatus: async (id: number): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Player/${id}/change-status`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store", 
+    });
+      if (!response.ok) {
+        throw new Error("No se pudo cambiar el estado del jugador");
+      }
+
+      const result: ApiResponseFormat<object> = await response.json(); //Se pasa object para que permita recibir el tipo de objeto dentro de la promesa ademas es lo que retorna la resp del back
+      return result.succeeded;
+    }
+    catch (error){
+      console.error("Error en playerService:", error);
+      throw error;
+    }
   }
+  
 };
 
