@@ -13,7 +13,7 @@ export interface PlayerStatsReadDTO {
     goals: number;
     assists: number;
 }
-// El DTO de tu jugador (pon los campos exactos que tienes en tu backend)
+// El DTO de tu jugador 
 export interface PlayerReadDTO {
   id: number;
   name: string;
@@ -33,7 +33,6 @@ export interface PlayerReadDTO {
   avgPhysicality: number;
   avgStrength: number;
   avgGoalkeeping: number;
-  // Puedes agregar aquí más adelante: position, rating, etc.
 }
 
 export interface PlayerUpdateDTO {
@@ -48,4 +47,36 @@ export interface PlayerUpdateDTO {
 export interface PlayerCreateDTO extends PlayerUpdateDTO {
  age: number;
 height: number;
+}
+
+export interface MatchDetailReadDto {
+  playerId: number;
+  playerName: string;
+  team: string;
+  recoveries: number;
+  tackler: number;
+  foulsCommited: number;
+}
+
+export interface GoalReadDTO {
+  id: number;
+  minute: number;
+  matchId: number;
+  playerId: number;
+  playerName: string;
+  playerGoals: number;
+  isPenalty: boolean;
+  assistedByPlayerId: number;
+  matchDate: string;
+}
+
+export interface MatchReadDTO {
+  id: number,
+  matchDate: string,
+  location: string,
+  teamAScore: number,
+  teamBScore: number,
+  Status: string,
+  matchDetails: MatchDetailReadDto[],
+  goals: GoalReadDTO[]
 }

@@ -58,7 +58,7 @@ export default function CompareCard({ playerData, side }: CompareCardProps) {
         </h2>
         {player.nickname && (
           <p className="text-xs md:text-sm text-emerald-400 italic">
-            "{player.nickname}"
+            {'"'}{player.nickname}{'"'}
           </p>
         )}
 
