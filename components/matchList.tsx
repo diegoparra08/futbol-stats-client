@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { MatchReadDTO } from "@/types";
 import { matchService } from "@/services/matchService";
+import MatchCard from "@/components/matchCard";
 import Link from "next/link";
 
 interface MatchListProps {
@@ -82,7 +83,7 @@ export default function MatchList({ initialMatches }: MatchListProps) {
     <div>
       {/* Barra de Herramientas de Partidos */}
       <div className="flex flex-col md:flex-row gap-4 mb-8 bg-slate-900 p-4 rounded-xl border border-slate-800 items-end">
-        {/* Buscador de canchas o locaciones */}
+        {/* Buscador de canchas */}
         <div className="flex-1 w-full">
           <label className="block text-xs text-slate-400 font-medium mb-1 uppercase tracking-wider">
             Buscar por Cancha / Sede
@@ -170,15 +171,9 @@ export default function MatchList({ initialMatches }: MatchListProps) {
         /* lista de partidos */
         <div className="grid gap-4 grid-cols-1">
           {filteredMatches.map((match) => (
-            <div
-              key={match.id}
-              className="p-6 bg-slate-900 rounded-xl border border-slate-800 hover:border-slate-700 transition-all cursor-pointer"
-            >
-              {/* MatchCard*/}
-              <p className="text-sm text-slate-400 font-mono text-center">
-                [MatchCard - ID: {match.id} - {match.location}]
-              </p>
-            </div>
+            <MatchCard 
+            key={match.id}
+            match={match} />   
           ))}
         </div>
       )}

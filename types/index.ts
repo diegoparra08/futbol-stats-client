@@ -54,8 +54,8 @@ export interface MatchDetailReadDto {
   playerName: string;
   team: string;
   recoveries: number;
-  tackler: number;
-  foulsCommited: number;
+  tackles: number;
+  foulsCommitted: number;
 }
 
 export interface GoalReadDTO {
@@ -76,7 +76,7 @@ export interface MatchReadDTO {
   location: string,
   teamAScore: number,
   teamBScore: number,
-  Status: string,
+  status: string,
   matchDetails: MatchDetailReadDto[],
   goals: GoalReadDTO[]
 }
