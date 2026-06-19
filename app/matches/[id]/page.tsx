@@ -31,14 +31,14 @@ export default async function MatchPage({ params }: Props) {
     <main className="container mx-auto p-6 bg-slate-950 min-h-screen text-slate-100">
       {/* Cabecera del Partido */}
       <div className="flex justify-between items-center mb-8">
-        <h1 className="text-xl font-bold text-slate-400">
-          Detalles del Encuentro #{id}
+        <h1 className="text-2xl font-black mb-6 uppercase tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-500">
+          Detalles del Partido
         </h1>
         <Link
           href="/matches"
-          className="text-sm text-emerald-400 hover:underline"
+          className="inline-flex items-center cursor-pointer gap-3 bg-slate-950/60 px-4 py-2 rounded-lg border border-slate-800 select-none hover:border-slate-700 transition-colors text-slate-400 font-medium mb-1 hover:text-slate-300"
         >
-          ⬅️ Volver a partidos
+          ⬅️Volver
         </Link>
       </div>
 

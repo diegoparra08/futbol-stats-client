@@ -17,7 +17,7 @@ export default function Home() {
             href="/players" 
             className="w-full bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold py-3 px-4 rounded-xl transition-all flex items-center justify-center gap-2"
           >
-            📋 Ver Plantilla de Jugadores
+           Ver Plantilla de Jugadores
           </Link>
 
           {/* Enlace provisional a Partidos (Dará 404 por ahora hasta que la crees) */}
@@ -25,13 +25,13 @@ export default function Home() {
             href="/matches" 
             className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl transition-all border border-slate-700 flex items-center justify-center gap-2"
           >
-            🏆 Gestionar Partidos
+           Gestionar Partidos
           </Link>
            <Link 
             href="/comparePlayers" 
             className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl transition-all border border-slate-700 flex items-center justify-center gap-2"
           >
-            🆚 Comparar Jugadores
+             Comparar Jugadores
           </Link>
         </div>
       </div>

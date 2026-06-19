@@ -45,7 +45,7 @@ export interface PlayerUpdateDTO {
 }
 
 export interface PlayerCreateDTO extends PlayerUpdateDTO {
- age: number;
+age: number;
 height: number;
 }
 
@@ -79,4 +79,22 @@ export interface MatchReadDTO {
   status: string,
   matchDetails: MatchDetailReadDto[],
   goals: GoalReadDTO[]
+}
+
+export interface MatchDetailCreateDto {
+  playerId: number;
+  team: 0 | 1;  // 0 = Equipo A, 1 = Equipo B
+}
+
+
+export interface MatchUpdateDTO {
+  matchDate: string;
+  location: string;
+}
+
+export interface MatchSaveDTO extends MatchUpdateDTO {
+  matchDetails: {
+    playerId: number;
+    team: 0 | 1;
+  }[];
 }

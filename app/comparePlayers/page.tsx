@@ -92,8 +92,8 @@ export default function ComparePlayers() {
   
   {/* TITLE */}
   <div className="w-1/2 md:w-auto text-left">
-    <h1 className="text-xl md:text-2xl font-black text-emerald-400 uppercase tracking-wider whitespace-nowrap">
-      📊 Comparar Jugadores
+    <h1 className="text-2xl font-black mb-6 uppercase tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-500">
+       Comparar Jugadores
     </h1>
   </div>
 
@@ -101,9 +101,9 @@ export default function ComparePlayers() {
   <div className="w-1/2 md:w-auto flex justify-start md:justify-end">
     <Link
       href="/"
-      className="inline-flex items-center justify-center gap-2 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-5 py-2 rounded-xl border border-slate-800 hover:border-slate-700 text-xs font-bold uppercase tracking-wider transition-all shadow-md w-full md:w-auto text-center"
+      className="inline-flex items-center cursor-pointer gap-3 bg-slate-950/60 px-4 py-2 rounded-lg border border-slate-800 select-none hover:border-slate-700 transition-colors text-slate-400 font-medium mb-1 hover:text-slate-300"
     >
-      ⬅️ Volver al Inicio
+      ⬅️Inicio
     </Link>
   </div>
 

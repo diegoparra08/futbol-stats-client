@@ -111,7 +111,7 @@ export default function MatchList({ initialMatches }: MatchListProps) {
     >
       {monthsOptions.map((m) => (
         <option key={m.value} value={m.value}>
-          🗓️ {m.label}
+           {m.label}
         </option>
       ))}
     </select>
@@ -129,7 +129,7 @@ export default function MatchList({ initialMatches }: MatchListProps) {
     >
       {yearsOptions.map((year) => (
         <option key={year} value={year}>
-          ⭐ {year}
+          {year}
         </option>
       ))}
     </select>
@@ -140,7 +140,7 @@ export default function MatchList({ initialMatches }: MatchListProps) {
         <div className="w-full md:w-auto flex items-center gap-3 justify-end">
           {/* Botón Nuevo Partido */}
           <Link
-            href="/partidos/crear"
+            href="/matches/new"
             className="inline-flex items-center text-sm uppercase cursor-pointer gap-2 bg-slate-950/60 px-4 py-2.5 rounded-lg border border-slate-800 select-none hover:border-slate-700 transition-colors text-slate-400 font-medium hover:text-slate-200 w-full md:w-auto justify-center"
           >
             Nuevo Partido <span className="text-slate-400">➕</span>
