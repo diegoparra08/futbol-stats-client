@@ -15,6 +15,7 @@ export default function EditMatchPage() {
 
   const [initialData, setInitialData] = useState<MatchUpdateDTO | null>(null);
   const [loading, setLoading] = useState(true);
+  const [matchStatus, setMatchStatus] = useState<string | null>(null);
 
   // Cargar la información actual del partido al montar la página
   useEffect(() => {
@@ -26,13 +27,17 @@ export default function EditMatchPage() {
         if (!response.ok) throw new Error("No se pudo obtener el partido");
         
         const data = await response.json();
-        
         const match = data.data || data; 
 
         setInitialData({
           matchDate: match.matchDate,
-          location: match.location,
+          location: match.location,        
         });
+
+        if (match.status !== undefined && match.status !== null) {
+          // Aseguramos que se guarde como string para mapearlo fácilmente en el Select
+          setMatchStatus(String(match.status));
+        }
       } catch (error) {
         console.error("Error al cargar el partido:", error);
         toast.error("Error al cargar los datos del partido");
@@ -44,7 +49,7 @@ export default function EditMatchPage() {
     fetchMatchData();
   }, [matchId]);
 
-  //notificar al usuario de que se ha actualizado correctamente
+  // Notificar al usuario de que se ha actualizado correctamente
   const handleSuccess = () => {
     toast.success("¡Información actualizada con éxito! ⚽", {
       duration: 3000,
@@ -60,7 +65,7 @@ export default function EditMatchPage() {
       },
     });
 
-    // Redireccion al panel principal tras ver la notificación
+    // Redirección al panel principal tras ver la notificación
     setTimeout(() => {
       router.push("/");
       router.refresh();
@@ -87,15 +92,18 @@ export default function EditMatchPage() {
           href="/"
           className="inline-flex items-center cursor-pointer gap-3 bg-slate-950/60 px-6 py-2 rounded-lg border border-slate-800 select-none hover:border-slate-700 transition-colors text-slate-400 font-medium hover:text-slate-300"
         >
-          ⬅️ Cancelar
+          ⬅️Volver
         </Link>
       </div>
 
       {initialData && (
-        // Se llama al componente de formulario con el mode edit para que sepa que es una actualización y no creación
         <MatchBasicForm 
-          initialData={{ ...initialData, id: matchId }} 
-          onSubmitSuccess={handleSuccess} 
+          initialData={{ 
+            ...initialData, 
+            id: matchId,  
+            status: matchStatus ?? "0",
+          }}
+          onSubmitSuccess={handleSuccess}
         />
       )}
     </div>

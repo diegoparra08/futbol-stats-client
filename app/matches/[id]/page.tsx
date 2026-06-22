@@ -1,3 +1,4 @@
+
 import { matchService } from "@/services/matchService";
 import StatusBadge from "@/components/statusBadge";
 import Link from "next/link";
@@ -5,6 +6,7 @@ import Link from "next/link";
 interface Props {
   params: Promise<{ id: string }>;
 }
+
 
 export default async function MatchPage({ params }: Props) {
   const { id } = await params;
@@ -27,7 +29,6 @@ export default async function MatchPage({ params }: Props) {
 
   const { goalsA, goalsB, squadA, squadB, stats } = processMatchData(match);
 
-  const isAdmin = true; //Por desarrollo. Debo cambiarla para obtenerla del token cuando implemente el inicio de sesion.
 
   return (
     <main className="container mx-auto p-6 bg-slate-950 min-h-screen text-slate-100">
@@ -74,17 +75,6 @@ export default async function MatchPage({ params }: Props) {
             Editar Partido <span className="text-slate-400 text-sm">✏️</span>
           </Link>
         </div>
-        {isAdmin && (
-          <div className="flex justify-center w-full">
-            <Link
-              href={`/matches/${match.id}/delete`}
-              className="inline-flex items-center justify-center gap-2 bg-slate-950/60 px-4 py-1.5 rounded-lg border border-slate-800 select-none hover:border-slate-600 transition-colors text-slate-400 text-xs font-semibold hover:text-slate-200 w-full max-w-[180px]"
-            >
-              Eliminar Partido{" "}
-              <span className="text-slate-400 text-sm">❌</span>
-            </Link>
-          </div>
-        )}
       </div>
 
       {/*Contenedor inferior */}
@@ -149,13 +139,17 @@ export default async function MatchPage({ params }: Props) {
               </p>
             ))}
           </div>
-          <div className="text-right">
-            {squadB.map((p) => (
-              <p key={p.playerId} className="text-sm text-slate-400">
-                {p.playerName}{" "}
-              </p>
-            ))}
-          </div>
+        <div className="text-right">
+  {squadB
+    .filter((player, index, self) => 
+      self.findIndex(t => t.playerId === player.playerId) === index
+    )
+    .map((p) => (
+      <p key={p.playerId} className="text-sm text-slate-400">
+        {p.playerName}{" "}
+      </p>
+    ))}
+</div>
         </div>
 
         {/* BARRAS DE ESTADÍSTICAS */}

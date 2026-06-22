@@ -1,6 +1,6 @@
 import { ApiResponseFormat, MatchReadDTO } from "@/types";
 import { API_BASE_URL } from "./api";
-import { deleteMapEntry } from "next/dist/client/components/segment-cache/cache-map";
+
 
 
 export const matchService = {
