@@ -49,7 +49,7 @@ export default function PlayerForm({ mode, initialData }: PlayerFormProps) {
       const mappedPositions = (initialData.positions || []).map((posLabel) => {
         // posLabel va a ser "CF", "ST", etc.
 
-        // Buscamos en tu lista de posiciones disponibles la que coincida con la sigla
+        // Buscamos en la lista de posiciones disponibles la que coincida con la sigla
         const foundPosition = AVAILABLE_POSITIONS.find(
           (p) => p.label.toUpperCase() === String(posLabel).toUpperCase(),
         );

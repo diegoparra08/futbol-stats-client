@@ -1,5 +1,6 @@
 import { ApiResponseFormat, MatchReadDTO } from "@/types";
 import { API_BASE_URL } from "./api";
+import { deleteMapEntry } from "next/dist/client/components/segment-cache/cache-map";
 
 
 export const matchService = {
@@ -45,5 +46,28 @@ export const matchService = {
       console.error("Error en matchService:", error);
       throw error;
     }
-  }
+  },
+
+  updateMatchStatus: async (id: number, status: string): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Match/${id}/status`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(status),
+        cache: "no-store", 
+      });
+      if (!response.ok) {
+        throw new Error("Error al conectar con la API");
+      }
+
+      const result: ApiResponseFormat<boolean> = await response.json();
+   
+      return result.succeeded;
+    } catch (error) {
+      console.error("Error en matchService:", error);
+      throw error;
+    }
+  },
 };

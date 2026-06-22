@@ -1,13 +1,9 @@
 "use client";
 
-import {
-  MatchSaveDTO,
-  MatchUpdateDTO,
-  MatchDetailCreateDto,
-} from "@/types";
+import { MatchSaveDTO, MatchUpdateDTO, MatchDetailCreateDto } from "@/types";
 import { API_BASE_URL } from "@/services/api";
 import { useState, useEffect } from "react";
-
+import toast, { Toaster } from "react-hot-toast";
 
 interface PlayerFromDB {
   id: number;
@@ -36,7 +32,9 @@ export default function MatchBasicForm({
   const [playersPerTeam, setPlayersPerTeam] = useState<number>(5); // Por defecto Fútbol 5
 
   const [matchFormData, setMatchFormData] = useState<MatchFormData>({
-    matchDate: initialData?.matchDate ? initialData.matchDate.substring(0, 16) : "",
+    matchDate: initialData?.matchDate
+      ? initialData.matchDate.substring(0, 16)
+      : "",
     location: initialData?.location || "",
     matchDetails: [],
   });
@@ -48,10 +46,10 @@ export default function MatchBasicForm({
     if (!isEditMode) {
       const fetchPlayers = async () => {
         try {
-          const response = await fetch(`${API_BASE_URL}/api/Player`); 
+          const response = await fetch(`${API_BASE_URL}/api/Player`);
           const data = await response.json();
 
-          setPlayersList(data.data || data); 
+          setPlayersList(data.data || data);
         } catch (error) {
           console.error("Error cargando jugadores:", error);
         }
@@ -60,15 +58,42 @@ export default function MatchBasicForm({
     }
   }, [isEditMode]);
 
-// Manejar el cambio de jugador en un Select específico
-  const handlePlayerSelectChange = (teamSide: 0 | 1, index: number, playerId: number) => {
-    setMatchFormData((prev) => {
+  // Manejar el cambio de jugador en un Select específico
+  const handlePlayerSelectChange = (
+    teamSide: 0 | 1,
+    index: number,
+    playerId: number,
+  ) => {
+    //se verifica si el jugador seleccionado ya se ha insertado en el equipo para no duplicar
+    const isDuplicate = matchFormData.matchDetails.some(
+      (d) => d.playerId === playerId,
+    );
 
+    if (playerId > 0 && isDuplicate) {
+      toast.error("Este jugador ya está en la alineación", {
+      duration: 3000,
+      position: "top-right",
+      style: {
+        background: "#0f172a", 
+        color: "#cbd5e1",     
+        border: "1px solid #1e293b", 
+      },
+      iconTheme: {
+        primary: "#ef4444",  
+        secondary: "#0f172a",
+      },
+    });
+    return; 
+    }
+    setMatchFormData((prev) => {
       const updatedDetails = [...prev.matchDetails];
-      
+
       // analizar si ya se ha insertado el jugador en la posición actual
       const existingIndex = updatedDetails.findIndex(
-        (d) => d.team === teamSide && updatedDetails.filter(x => x.team === teamSide).indexOf(d) === index
+        (d) =>
+          d.team === teamSide &&
+          updatedDetails.filter((x) => x.team === teamSide).indexOf(d) ===
+            index,
       );
 
       const newDetail: MatchDetailCreateDto = { playerId, team: teamSide };
@@ -94,23 +119,28 @@ export default function MatchBasicForm({
           location: matchFormData.location,
         };
 
-        const response = await fetch(`${API_BASE_URL}/api/Match/${initialData.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(updatePayload),
-        });
+        const response = await fetch(
+          `${API_BASE_URL}/api/Match/${initialData.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(updatePayload),
+          },
+        );
 
         if (response.ok) onSubmitSuccess();
       } else {
         // Filtrar los selects que se quedaron vacíos (Id = 0)
-        const cleanDetails = matchFormData.matchDetails.filter(d => d.playerId > 0);
+        const cleanDetails = matchFormData.matchDetails.filter(
+          (d) => d.playerId > 0,
+        );
 
         const createPayload: MatchSaveDTO = {
           matchDate: matchFormData.matchDate,
           location: matchFormData.location,
           matchDetails: cleanDetails,
         };
-        
+
         const response = await fetch(`${API_BASE_URL}/api/Match`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -127,34 +157,58 @@ export default function MatchBasicForm({
   };
 
   // renderizar los N selects de un equipo segun lo que el usuario seleccione
-  const renderTeamSelects = (teamSide: 0 | 1) => {
-    return Array.from({ length: playersPerTeam }).map((_, index) => {
-      
-      const currentSelection = matchFormData.matchDetails.filter(d => d.team === teamSide)[index];
-      
-      return (
-        <div key={index} className="flex flex-col gap-1">
-          <label className="text-[10px] text-slate-500 font-mono font-bold uppercase">Jugador {index + 1}</label>
-          <select
-            value={currentSelection?.playerId || ""}
-            onChange={(e) => handlePlayerSelectChange(teamSide, index, Number(e.target.value))}
-            className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
-            required={!isEditMode}
-          >
-            <option value="">-- Seleccionar --</option>
-            {playersList.map((player) => (
-              <option key={player.id} value={player.id}>
+const renderTeamSelects = (teamSide: 0 | 1) => {
+  return Array.from({ length: playersPerTeam }).map((_, index) => {
+    
+    // Obtener qué jugador está ocupando este select actual en la UI
+    const currentSelection = matchFormData.matchDetails.filter(d => d.team === teamSide)[index];
+    
+    return (
+      <div key={index} className="flex flex-col gap-1">
+        <label className="text-[10px] text-slate-500 font-mono font-bold uppercase">
+          Jugador {index + 1}
+        </label>
+        
+        <select
+          value={currentSelection?.playerId || ""}
+          onChange={(e) => handlePlayerSelectChange(teamSide, index, Number(e.target.value))}
+          className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
+          required={!isEditMode}
+        >
+          <option value="">-- Seleccionar --</option>
+          
+          {playersList.map((player) => {
+            // Verificar si el jugador ya fue elegido en alguna parte de la alineación
+            const isAlreadySelected = matchFormData.matchDetails.some(
+              (d) => d.playerId === player.id
+            );
+
+            // Excepción: permitirle estar activo en el select donde está parado actualmente
+            const isSelectedInCurrentSelect = currentSelection?.playerId === player.id;
+
+            return (
+              <option
+                key={player.id}
+                value={player.id}
+                disabled={isAlreadySelected && !isSelectedInCurrentSelect} //  Bloqueo visual
+                className={isAlreadySelected && !isSelectedInCurrentSelect ? "text-slate-600 italic" : ""}
+              >
                 {player.name}
+                {isAlreadySelected && !isSelectedInCurrentSelect ? " (Seleccionado)" : ""}
               </option>
-            ))}
-          </select>
-        </div>
-      );
-    });
-  };
+            );
+          })}
+        </select>
+      </div>
+    );
+  });
+};
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 bg-slate-900 p-6 rounded-xl border border-slate-800">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-slate-900 p-6 rounded-xl border border-slate-800"
+    >
       <h2 className="text-lg font-bold text-slate-200">
         {isEditMode ? "📝 Editar Información" : "➕ Crear Nuevo Partido"}
       </h2>
@@ -162,22 +216,30 @@ export default function MatchBasicForm({
       {/* Inputs Básicos */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">Fecha</label>
+          <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">
+            Fecha
+          </label>
           <input
             type="datetime-local"
             value={matchFormData.matchDate}
-            onChange={(e) => setMatchFormData({ ...matchFormData, matchDate: e.target.value })}
+            onChange={(e) =>
+              setMatchFormData({ ...matchFormData, matchDate: e.target.value })
+            }
             className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500"
             required
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">Lugar</label>
+          <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">
+            Lugar
+          </label>
           <input
             type="text"
             value={matchFormData.location}
-            onChange={(e) => setMatchFormData({ ...matchFormData, location: e.target.value })}
+            onChange={(e) =>
+              setMatchFormData({ ...matchFormData, location: e.target.value })
+            }
             className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500"
             required
           />
@@ -189,18 +251,24 @@ export default function MatchBasicForm({
         <div className="border-t border-slate-800 pt-4 space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">Alineaciones del Partido</h3>
-              <p className="text-xs text-slate-500">Selecciona el formato de juego y asigna los jugadores.</p>
+              <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+                Alineaciones del Partido
+              </h3>
+              <p className="text-xs text-slate-500">
+                Selecciona el formato de juego y asigna los jugadores.
+              </p>
             </div>
-            
+
             {/* Selector de tamaño de equipo */}
             <div className="flex items-center gap-2 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-              <span className="text-xs font-mono text-slate-400 px-2">Jugadores por Equipo:</span>
+              <span className="text-xs font-mono text-slate-400 px-2">
+                Jugadores por Equipo:
+              </span>
               <select
                 value={playersPerTeam}
                 onChange={(e) => {
                   setPlayersPerTeam(Number(e.target.value));
-                  setMatchFormData(prev => ({ ...prev, matchDetails: [] })); // Reseteamos alineación al cambiar tamaño
+                  setMatchFormData((prev) => ({ ...prev, matchDetails: [] })); // Reseteamos alineación al cambiar tamaño
                 }}
                 className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:outline-none"
               >
@@ -220,7 +288,7 @@ export default function MatchBasicForm({
             {/* Columna Equipo A */}
             <div className="space-y-3">
               <h4 className="text-xs font-black text-emerald-400 uppercase tracking-widest pb-1 border-b border-emerald-500/20">
-                 Equipo A
+                Equipo A
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {renderTeamSelects(0)} {/* TEAM_A */}
@@ -230,7 +298,7 @@ export default function MatchBasicForm({
             {/* Columna Equipo B */}
             <div className="space-y-3">
               <h4 className="text-xs font-black text-teal-400 uppercase tracking-widest pb-1 border-b border-teal-500/20">
-                 Equipo B
+                Equipo B
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {renderTeamSelects(1)} {/* TEAM_B */}
@@ -245,7 +313,11 @@ export default function MatchBasicForm({
         disabled={loading}
         className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 font-bold py-2.5 rounded text-slate-950 transition-colors"
       >
-        {loading ? "Procesando..." : isEditMode ? "Guardar Cambios" : "Crear Partido con Alineación"}
+        {loading
+          ? "Procesando..."
+          : isEditMode
+            ? "Guardar Cambios"
+            : "Crear Partido con Alineación"}
       </button>
     </form>
   );

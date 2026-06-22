@@ -27,6 +27,8 @@ export default async function MatchPage({ params }: Props) {
 
   const { goalsA, goalsB, squadA, squadB, stats } = processMatchData(match);
 
+  const isAdmin = true; //Por desarrollo. Debo cambiarla para obtenerla del token cuando implemente el inicio de sesion.
+
   return (
     <main className="container mx-auto p-6 bg-slate-950 min-h-screen text-slate-100">
       {/* Cabecera del Partido */}
@@ -42,7 +44,7 @@ export default async function MatchPage({ params }: Props) {
         </Link>
       </div>
 
-      {/* Render de datos puros (No requiere interactividad) */}
+      {/* Render de datos puros */}
       <div className="bg-slate-900 border border-slate-800 p-6 rounded-xl">
         <h2 className="text-2xl font-black text-center mb-4">
           Equipo A{" "}
@@ -51,16 +53,38 @@ export default async function MatchPage({ params }: Props) {
           </span>{" "}
           Equipo B
         </h2>
+
         <div className="text-center mb-4">
           <StatusBadge status={match.status} />
         </div>
+
         <p className="text-center text-sm text-slate-400">
           📍 Cancha: {match.location}
         </p>
-        <p className="text-center text-sm text-slate-400">
-           Fecha: {formattedDate}
+
+        <p className="text-center text-sm text-slate-400 mb-6">
+          Fecha: {formattedDate}
         </p>
 
+        <div className="flex justify-center w-full">
+          <Link
+            href={`/matches/${match.id}/update`}
+            className="inline-flex items-center justify-center gap-2 bg-slate-950/60 px-4 py-1.5 rounded-lg border border-slate-800 select-none hover:border-slate-600 transition-colors text-slate-400 text-xs font-semibold hover:text-slate-200 w-full max-w-[180px]"
+          >
+            Editar Partido <span className="text-slate-400 text-sm">✏️</span>
+          </Link>
+        </div>
+        {isAdmin && (
+          <div className="flex justify-center w-full">
+            <Link
+              href={`/matches/${match.id}/delete`}
+              className="inline-flex items-center justify-center gap-2 bg-slate-950/60 px-4 py-1.5 rounded-lg border border-slate-800 select-none hover:border-slate-600 transition-colors text-slate-400 text-xs font-semibold hover:text-slate-200 w-full max-w-[180px]"
+            >
+              Eliminar Partido{" "}
+              <span className="text-slate-400 text-sm">❌</span>
+            </Link>
+          </div>
+        )}
       </div>
 
       {/*Contenedor inferior */}
@@ -206,6 +230,7 @@ export default async function MatchPage({ params }: Props) {
 
 //Funcion que segrega las estadisticas y alineaciones por equipo
 import { MatchReadDTO, GoalReadDTO } from "@/types";
+import { Truculenta } from "next/font/google";
 
 export function processMatchData(match: MatchReadDTO) {
   //Alineaciones por equipo
