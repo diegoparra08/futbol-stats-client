@@ -98,3 +98,16 @@ export interface MatchSaveDTO extends MatchUpdateDTO {
     team: 0 | 1;
   }[];
 }
+
+export interface PlayerStatUpdateInput {
+  playerId: number;
+  playerName?: string; // Útil para renderizar el nombre en la UI
+  team: 0 | 1;
+  recoveries: number;
+  tackles: number;
+  foulsCommitted: number;
+}
+
+export interface MatchStatsUpdateDTO {
+  playersStats: PlayerStatUpdateInput[];
+}

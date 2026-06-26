@@ -23,10 +23,10 @@ interface MatchBasicInfoFormProps {
 }
 
 const MATCH_STATUSES = [
-  { id: '0', label: 'Programado' },
-  { id: '1', label: 'En Juego' }, // Corregido typo "Juegio"
-  { id: '2', label: 'Finalizado' },
-  { id: '3', label: 'Cancelado' }
+  { id: "0", label: "Programado" },
+  { id: "1", label: "En Juego" },
+  { id: "2", label: "Finalizado" },
+  { id: "3", label: "Cancelado" },
 ];
 
 export default function MatchBasicForm({
@@ -40,11 +40,11 @@ export default function MatchBasicForm({
   const [playersPerTeam, setPlayersPerTeam] = useState<number>(5); // Por defecto Fútbol 5
 
   const [onlyStatusEdit, setOnlyStatusEdit] = useState<boolean>(false);
-  
+
   // Estado local para manejar el select del estado de manera reactiva
- const [currentStatus, setCurrentStatus] = useState<string>(() => {
-  return initialData?.status ? String(initialData.status) : "0";
-});
+  const [currentStatus, setCurrentStatus] = useState<string>(() => {
+    return initialData?.status ? String(initialData.status) : "0";
+  });
 
   const [matchFormData, setMatchFormData] = useState<MatchFormData>({
     matchDate: initialData?.matchDate
@@ -55,7 +55,7 @@ export default function MatchBasicForm({
   });
 
   const [loading, setLoading] = useState(false);
-
+  const isAdmin = true; //Cambiar esto cuando implementemos el control de acceso
 
   useEffect(() => {
     const fetchPlayers = async () => {
@@ -85,16 +85,16 @@ export default function MatchBasicForm({
         duration: 3000,
         position: "top-right",
         style: {
-          background: "#0f172a", 
-          color: "#cbd5e1",     
-          border: "1px solid #1e293b", 
+          background: "#0f172a",
+          color: "#cbd5e1",
+          border: "1px solid #1e293b",
         },
         iconTheme: {
-          primary: "#ef4444",  
+          primary: "#ef4444",
           secondary: "#0f172a",
         },
       });
-      return; 
+      return;
     }
 
     setMatchFormData((prev) => {
@@ -103,15 +103,16 @@ export default function MatchBasicForm({
       const existingIndex = updatedDetails.findIndex(
         (d) =>
           d.team === teamSide &&
-          updatedDetails.filter((x) => x.team === teamSide).indexOf(d) === index,
+          updatedDetails.filter((x) => x.team === teamSide).indexOf(d) ===
+            index,
       );
 
       const newDetail: MatchDetailCreateDto = { playerId, team: teamSide };
 
       if (existingIndex >= 0) {
-        updatedDetails[existingIndex] = newDetail; 
+        updatedDetails[existingIndex] = newDetail;
       } else {
-        updatedDetails.push(newDetail); 
+        updatedDetails.push(newDetail);
       }
 
       return { ...prev, matchDetails: updatedDetails };
@@ -160,21 +161,19 @@ export default function MatchBasicForm({
       }
     } catch (error) {
       console.error("Error al procesar el partido:", error);
-      toast.error("Hubo un error al guardar los datos del partido", 
-        {
+      toast.error("Hubo un error al guardar los datos del partido", {
         duration: 3000,
         position: "top-right",
         style: {
-          background: "#0f172a", 
-          color: "#cbd5e1",     
-          border: "1px solid #1e293b", 
+          background: "#0f172a",
+          color: "#cbd5e1",
+          border: "1px solid #1e293b",
         },
         iconTheme: {
-          primary: "#ef4444",  
+          primary: "#ef4444",
           secondary: "#0f172a",
         },
-      }
-      );
+      });
     } finally {
       setLoading(false);
     }
@@ -183,22 +182,25 @@ export default function MatchBasicForm({
   // Manejador del cambio de estado del partido
   const handleStatusChange = async (statusId: string) => {
     setCurrentStatus(statusId); // Actualización visual inmediata en el select
-    
+
     if (!isEditMode || !initialData?.id) return;
 
     try {
-      // Disparamos la petición al servicio externo
-      const updatedStatus = await matchService.updateMatchStatus(initialData.id, statusId);
+      //petivion a service
+      const updatedStatus = await matchService.updateMatchStatus(
+        initialData.id,
+        statusId,
+      );
       if (updatedStatus) {
         toast.success("Estado del partido actualizado en vivo", {
-        duration: 3000,
-        position: "top-right",
-        style: {
-          background: "#0f172a", 
-          color: "#cbd5e1",     
-          border: "1px solid #1e293b", 
-        }
-      });
+          duration: 3000,
+          position: "top-right",
+          style: {
+            background: "#0f172a",
+            color: "#cbd5e1",
+            border: "1px solid #1e293b",
+          },
+        });
       }
     } catch (error) {
       console.error("Error actualizando el estado del partido:", error);
@@ -208,37 +210,48 @@ export default function MatchBasicForm({
 
   const renderTeamSelects = (teamSide: 0 | 1) => {
     return Array.from({ length: playersPerTeam }).map((_, index) => {
-      const currentSelection = matchFormData.matchDetails.filter(d => d.team === teamSide)[index];
-      
+      const currentSelection = matchFormData.matchDetails.filter(
+        (d) => d.team === teamSide,
+      )[index];
+
       return (
         <div key={index} className="flex flex-col gap-1">
           <label className="text-[10px] text-slate-500 font-mono font-bold uppercase">
             Jugador {index + 1}
           </label>
-          
+
           <select
             value={currentSelection?.playerId || ""}
-            onChange={(e) => handlePlayerSelectChange(teamSide, index, Number(e.target.value))}
+            onChange={(e) =>
+              handlePlayerSelectChange(teamSide, index, Number(e.target.value))
+            }
             className="w-full bg-slate-950 border border-slate-800 rounded px-2 py-1.5 text-sm text-slate-200 focus:outline-none focus:border-emerald-500"
             required={!isEditMode}
           >
             <option value="">-- Seleccionar --</option>
-            
+
             {playersList.map((player) => {
               const isAlreadySelected = matchFormData.matchDetails.some(
-                (d) => d.playerId === player.id
+                (d) => d.playerId === player.id,
               );
-              const isSelectedInCurrentSelect = currentSelection?.playerId === player.id;
+              const isSelectedInCurrentSelect =
+                currentSelection?.playerId === player.id;
 
               return (
                 <option
                   key={player.id}
                   value={player.id}
                   disabled={isAlreadySelected && !isSelectedInCurrentSelect}
-                  className={isAlreadySelected && !isSelectedInCurrentSelect ? "text-slate-600 italic" : ""}
+                  className={
+                    isAlreadySelected && !isSelectedInCurrentSelect
+                      ? "text-slate-600 italic"
+                      : ""
+                  }
                 >
                   {player.name}
-                  {isAlreadySelected && !isSelectedInCurrentSelect ? " (Seleccionado)" : ""}
+                  {isAlreadySelected && !isSelectedInCurrentSelect
+                    ? " (Seleccionado)"
+                    : ""}
                 </option>
               );
             })}
@@ -249,170 +262,170 @@ export default function MatchBasicForm({
   };
 
   return (
-  <form
-    onSubmit={handleSubmit}
-    className="space-y-6 bg-slate-900 p-6 rounded-xl border border-slate-800"
-  >
-    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
-      <h2 className="text-lg font-bold text-slate-200">
-        {isEditMode ? "📝 Editar Información" : "➕ Crear Nuevo Partido"}
-      </h2>
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-6 bg-slate-900 p-6 rounded-xl border border-slate-800"
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-slate-800">
+        <h2 className="text-lg font-bold text-slate-200">
+          {isEditMode ? "📝 Editar Información" : "➕ Crear Nuevo Partido"}
+        </h2>
 
-      {/* Checkbox de control para activar solo la edición de estado en vivo */}
-      {isEditMode && (
-        <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
-          <input
-            type="checkbox"
-            id="onlyStatusEdit"
-            checked={onlyStatusEdit}
-            onChange={(e) => setOnlyStatusEdit(e.target.checked)}
-            className="accent-emerald-500 h-4 w-4 cursor-pointer"
-          />
-          <label
-            htmlFor="onlyStatusEdit"
-            className="text-xs text-slate-400 font-medium cursor-pointer select-none"
-          >
-            Solo actualizar estado en vivo
+        {/* Checkbox de control para activar solo la edición de estado en vivo */}
+        {isEditMode && isAdmin && (
+          <div className="flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800">
+            <input
+              type="checkbox"
+              id="onlyStatusEdit"
+              checked={onlyStatusEdit}
+              onChange={(e) => setOnlyStatusEdit(e.target.checked)}
+              className="accent-emerald-500 h-4 w-4 cursor-pointer"
+            />
+            <label
+              htmlFor="onlyStatusEdit"
+              className="text-xs text-slate-400 font-medium cursor-pointer select-none"
+            >
+              Solo actualizar estado en vivo
+            </label>
+          </div>
+        )}
+      </div>
+
+      {/* Inputs Básicos */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">
+            Fecha
           </label>
+          <input
+            type="datetime-local"
+            value={matchFormData.matchDate}
+            onChange={(e) =>
+              setMatchFormData({ ...matchFormData, matchDate: e.target.value })
+            }
+            disabled={isEditMode && onlyStatusEdit}
+            className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            required={!onlyStatusEdit}
+          />
+        </div>
+
+        <div>
+          <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">
+            Lugar
+          </label>
+          <input
+            type="text"
+            value={matchFormData.location}
+            onChange={(e) =>
+              setMatchFormData({ ...matchFormData, location: e.target.value })
+            }
+            disabled={isEditMode && onlyStatusEdit}
+            className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            required={!onlyStatusEdit}
+          />
+        </div>
+
+        {/* Campo de Estado - Solo se muestra o habilita correctamente en modo edición */}
+        <div className="md:col-span-2">
+          <div className="flex justify-between items-center mb-1">
+            <label className="block text-xs font-semibold text-slate-400 uppercase">
+              Estado del Partido
+            </label>
+            {isEditMode && onlyStatusEdit && (
+              <span className="text-[10px] text-emerald-400 font-mono animate-pulse">
+                ● Cambios en tiempo real activados
+              </span>
+            )}
+          </div>
+          <select
+            value={currentStatus}
+            onChange={(e) => handleStatusChange(e.target.value)}
+            disabled={isEditMode && !onlyStatusEdit}
+            className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
+            required
+          >
+            {MATCH_STATUSES.map((status) => (
+              <option key={status.id} value={status.id}>
+                {status.label}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Seleccionar alineación de equipos si es modo creación */}
+      {!isEditMode && (
+        <div className="border-t border-slate-800 pt-4 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
+                Alineaciones del Partido
+              </h3>
+              <p className="text-xs text-slate-500">
+                Selecciona el formato de juego y asigna los jugadores.
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
+              <span className="text-xs font-mono text-slate-400 px-2">
+                Jugadores por Equipo:
+              </span>
+              <select
+                value={playersPerTeam}
+                onChange={(e) => {
+                  setPlayersPerTeam(Number(e.target.value));
+                  setMatchFormData((prev) => ({ ...prev, matchDetails: [] }));
+                }}
+                className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:outline-none"
+              >
+                <option value={5}>5 vs 5</option>
+                <option value={6}>6 vs 6</option>
+                <option value={7}>7 vs 7</option>
+                <option value={8}>8 vs 8</option>
+                <option value={9}>9 vs 9</option>
+                <option value={10}>10 vs 10</option>
+                <option value={11}>11 vs 11</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
+            {/* Columna Equipo A */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-emerald-400 uppercase tracking-widest pb-1 border-b border-emerald-500/20">
+                Equipo A
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {renderTeamSelects(0)}
+              </div>
+            </div>
+
+            {/* Columna Equipo B */}
+            <div className="space-y-3">
+              <h4 className="text-xs font-black text-teal-400 uppercase tracking-widest pb-1 border-b border-teal-500/20">
+                Equipo B
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {renderTeamSelects(1)}
+              </div>
+            </div>
+          </div>
         </div>
       )}
-    </div>
 
-    {/* Inputs Básicos */}
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div>
-        <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">
-          Fecha
-        </label>
-        <input
-          type="datetime-local"
-          value={matchFormData.matchDate}
-          onChange={(e) =>
-            setMatchFormData({ ...matchFormData, matchDate: e.target.value })
-          }
-          disabled={isEditMode && onlyStatusEdit}
-          className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
-          required={!onlyStatusEdit}
-        />
-      </div>
-
-      <div>
-        <label className="block text-xs font-semibold text-slate-400 uppercase mb-1">
-          Lugar
-        </label>
-        <input
-          type="text"
-          value={matchFormData.location}
-          onChange={(e) =>
-            setMatchFormData({ ...matchFormData, location: e.target.value })
-          }
-          disabled={isEditMode && onlyStatusEdit}
-          className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
-          required={!onlyStatusEdit}
-        />
-      </div>
-
-      {/* Campo de Estado - Solo se muestra o habilita correctamente en modo edición */}
-      <div className="md:col-span-2">
-        <div className="flex justify-between items-center mb-1">
-          <label className="block text-xs font-semibold text-slate-400 uppercase">
-            Estado del Partido
-          </label>
-          {isEditMode && onlyStatusEdit && (
-            <span className="text-[10px] text-emerald-400 font-mono animate-pulse">
-              ● Cambios en tiempo real activados
-            </span>
-          )}
-        </div>
-        <select
-          value={currentStatus}
-          onChange={(e) => handleStatusChange(e.target.value)}
-          disabled={isEditMode && !onlyStatusEdit}
-          className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-slate-200 focus:outline-none focus:border-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed"
-          required
-        >
-          {MATCH_STATUSES.map((status) => (
-            <option key={status.id} value={status.id}>
-              {status.label}
-            </option>
-          ))}
-        </select>
-      </div>
-    </div>
-
-    {/* Seleccionar alineación de equipos si es modo creación */}
-    {!isEditMode && (
-      <div className="border-t border-slate-800 pt-4 space-y-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-          <div>
-            <h3 className="text-sm font-bold text-slate-300 uppercase tracking-wider">
-              Alineaciones del Partido
-            </h3>
-            <p className="text-xs text-slate-500">
-              Selecciona el formato de juego y asigna los jugadores.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-2 bg-slate-950 p-1.5 rounded-lg border border-slate-800">
-            <span className="text-xs font-mono text-slate-400 px-2">
-              Jugadores por Equipo:
-            </span>
-            <select
-              value={playersPerTeam}
-              onChange={(e) => {
-                setPlayersPerTeam(Number(e.target.value));
-                setMatchFormData((prev) => ({ ...prev, matchDetails: [] }));
-              }}
-              className="bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-emerald-400 font-bold focus:outline-none"
-            >
-              <option value={5}>5 vs 5</option>
-              <option value={6}>6 vs 6</option>
-              <option value={7}>7 vs 7</option>
-              <option value={8}>8 vs 8</option>
-              <option value={9}>9 vs 9</option>
-              <option value={10}>10 vs 10</option>
-              <option value={11}>11 vs 11</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-slate-950/40 p-4 rounded-xl border border-slate-800/60">
-          {/* Columna Equipo A */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-black text-emerald-400 uppercase tracking-widest pb-1 border-b border-emerald-500/20">
-              Equipo A
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {renderTeamSelects(0)}
-            </div>
-          </div>
-
-          {/* Columna Equipo B */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-black text-teal-400 uppercase tracking-widest pb-1 border-b border-teal-500/20">
-              Equipo B
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {renderTeamSelects(1)}
-            </div>
-          </div>
-        </div>
-      </div>
-    )}
-
-    <button
-      type="submit"
-      disabled={loading || (isEditMode && onlyStatusEdit)}
-      className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 font-bold py-2.5 rounded text-slate-950 transition-colors disabled:cursor-not-allowed"
-    >
-      {loading
-        ? "Procesando..."
-        : isEditMode
-          ? onlyStatusEdit
-            ? "Estado Actualizado en Vivo"
-            : "Guardar Cambios de Fecha y Lugar"
-          : "Crear Partido con Alineación"}
-    </button>
-  </form>
-);
+      <button
+        type="submit"
+        disabled={loading || (isEditMode && onlyStatusEdit)}
+        className="w-full bg-emerald-500 hover:bg-emerald-600 disabled:bg-slate-800 disabled:text-slate-500 font-bold py-2.5 rounded text-slate-950 transition-colors disabled:cursor-not-allowed"
+      >
+        {loading
+          ? "Procesando..."
+          : isEditMode
+            ? onlyStatusEdit
+              ? "Estado Actualizado en Vivo"
+              : "Guardar Cambios de Fecha y Lugar"
+            : "Crear Partido con Alineación"}
+      </button>
+    </form>
+  );
 }

@@ -1,4 +1,3 @@
-
 import { matchService } from "@/services/matchService";
 import StatusBadge from "@/components/statusBadge";
 import Link from "next/link";
@@ -6,7 +5,6 @@ import Link from "next/link";
 interface Props {
   params: Promise<{ id: string }>;
 }
-
 
 export default async function MatchPage({ params }: Props) {
   const { id } = await params;
@@ -28,7 +26,6 @@ export default async function MatchPage({ params }: Props) {
   });
 
   const { goalsA, goalsB, squadA, squadB, stats } = processMatchData(match);
-
 
   return (
     <main className="container mx-auto p-6 bg-slate-950 min-h-screen text-slate-100">
@@ -139,17 +136,19 @@ export default async function MatchPage({ params }: Props) {
               </p>
             ))}
           </div>
-        <div className="text-right">
-  {squadB
-    .filter((player, index, self) => 
-      self.findIndex(t => t.playerId === player.playerId) === index
-    )
-    .map((p) => (
-      <p key={p.playerId} className="text-sm text-slate-400">
-        {p.playerName}{" "}
-      </p>
-    ))}
-</div>
+          <div className="text-right">
+            {squadB
+              .filter(
+                (player, index, self) =>
+                  self.findIndex((t) => t.playerId === player.playerId) ===
+                  index,
+              )
+              .map((p) => (
+                <p key={p.playerId} className="text-sm text-slate-400">
+                  {p.playerName}{" "}
+                </p>
+              ))}
+          </div>
         </div>
 
         {/* BARRAS DE ESTADÍSTICAS */}
@@ -191,7 +190,7 @@ export default async function MatchPage({ params }: Props) {
               <div
                 className="bg-teal-500"
                 style={{
-                  width: `${stats.tacklesA + stats.tacklesB > 0 ? (stats.tacklesB / (stats.tacklesA + stats.tacklesB)) * 100 : 50}%`,
+                  width: `${stats.tacklesB + stats.tacklesB > 0 ? (stats.tacklesB / (stats.tacklesA + stats.tacklesB)) * 100 : 50}%`,
                 }}
               />
             </div>
@@ -211,11 +210,21 @@ export default async function MatchPage({ params }: Props) {
               <div
                 className="bg-teal-500"
                 style={{
-                  width: `${stats.foulsA + stats.foulsB > 0 ? (stats.foulsB / (stats.foulsA + stats.foulsB)) * 100 : 50}%`,
+                  width: `${stats.foulsB + stats.foulsB > 0 ? (stats.foulsB / (stats.foulsA + stats.foulsB)) * 100 : 50}%`,
                 }}
               />
             </div>
           </div>
+        </div>
+
+        {/* Botón de actualización*/}
+        <div className="flex justify-center w-full pt-2">
+          <Link
+            href={`/matches/${match.id}/stats`}
+            className="inline-flex items-center justify-center gap-2 bg-slate-950/60 px-6 py-2.5 rounded-lg border border-slate-800 select-none hover:border-slate-600 transition-colors text-slate-400 text-xs font-semibold hover:text-slate-200 w-full sm:max-w-md text-center"
+          >
+            Actualizar Alineaciones / Estadísticas{" "}
+          </Link>
         </div>
       </div>
     </main>
@@ -224,7 +233,6 @@ export default async function MatchPage({ params }: Props) {
 
 //Funcion que segrega las estadisticas y alineaciones por equipo
 import { MatchReadDTO, GoalReadDTO } from "@/types";
-import { Truculenta } from "next/font/google";
 
 export function processMatchData(match: MatchReadDTO) {
   //Alineaciones por equipo

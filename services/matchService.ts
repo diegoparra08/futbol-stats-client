@@ -1,4 +1,4 @@
-import { ApiResponseFormat, MatchReadDTO } from "@/types";
+import { ApiResponseFormat, MatchReadDTO, MatchStatsUpdateDTO } from "@/types";
 import { API_BASE_URL } from "./api";
 
 
@@ -70,4 +70,21 @@ export const matchService = {
       throw error;
     }
   },
+  // services/matchService.ts
+updateMatchPlayerStats: async (id: number, payload: MatchStatsUpdateDTO): Promise<boolean> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/Match/${id}/teams&stats`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    return response.ok;
+  } catch (error) {
+    console.error("Error en updateMatchPlayerStats:", error);
+    throw error;
+  }
+}
 };
