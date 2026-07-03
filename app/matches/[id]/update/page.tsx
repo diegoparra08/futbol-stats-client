@@ -65,9 +65,9 @@ export default function EditMatchPage() {
       },
     });
 
-    // Redirección al panel principal tras ver la notificación
+   //redireccionamos al panel principal
     setTimeout(() => {
-      router.push("/");
+      router.push("/matches");
       router.refresh();
     }, 1500);
   };

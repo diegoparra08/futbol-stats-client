@@ -1,5 +1,7 @@
 // types/index.ts
 
+import { isHmrRefresh } from "next/dist/server/app-render/work-unit-async-storage.external";
+
 // El formato estandar de respuestas de la API cuando trae datos viene el data cuando no viene vacio.
 export interface ApiResponseFormat<T> {
   data: T;
@@ -101,7 +103,7 @@ export interface MatchSaveDTO extends MatchUpdateDTO {
 
 export interface PlayerStatUpdateInput {
   playerId: number;
-  playerName?: string; // Útil para renderizar el nombre en la UI
+  playerName?: string; 
   team: 0 | 1;
   recoveries: number;
   tackles: number;
@@ -110,4 +112,16 @@ export interface PlayerStatUpdateInput {
 
 export interface MatchStatsUpdateDTO {
   playersStats: PlayerStatUpdateInput[];
+}
+
+export interface GoalCreateDTO extends GoalUpdateDTO{
+  matchId: number;
+}
+
+export interface GoalUpdateDTO {
+  minute: number;
+  playerId: number;
+  isPenalty: boolean;
+  isFreeKick: boolean;
+  assistedByPlayerId: number;
 }

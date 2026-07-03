@@ -27,7 +27,7 @@ export default function NewPlayerPage() {
 
 
     setTimeout(() => {
-      router.push("/");
+      router.push("/matches");
       router.refresh();
     }, 1500);
   };

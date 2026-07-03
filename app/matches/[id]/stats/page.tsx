@@ -11,19 +11,19 @@ export default function MatchStatsPage() {
   // Capturamos el ID de la URL dinámicamente y lo convertimos a número
   const matchId = Number(params.id);
 
-  // ¿Qué pasa cuando el formulario guarda con éxito en la base de datos?
+
   const handleSuccess = () => {
-    // Redirigimos al usuario de vuelta al detalle del partido o al dashboard principal
+
     setTimeout(() => {
-      router.push("/");
-      router.refresh(); // Refresca los componentes del servidor para mostrar los nuevos números
+      router.push("/matches");
+      router.refresh(); 
     }, 1500);
   };
 
   if (!matchId) {
     return (
       <div className="flex items-center justify-center min-h-100 text-slate-400">
-        ❌ ID de partido no válido o no encontrado.
+        ID de partido no válido o no encontrado.
       </div>
     );
   }
