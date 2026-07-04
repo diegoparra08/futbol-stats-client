@@ -37,7 +37,7 @@ return (
           <div className="flex items-center gap-2 mb-1.5">
            <StatusBadge status={match.status} />
             <span className="text-[11px] text-slate-500 font-medium font-mono">
-              #{match.id}
+              ID de Partido: {match.id}
             </span>
           </div>
 

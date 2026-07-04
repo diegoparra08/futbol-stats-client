@@ -49,4 +49,27 @@ export const goalService = {
       throw error;
     }
   },
+
+  updateGoal: async (id: number, payload: GoalUpdateDTO): Promise<boolean> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Goal/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al actualizar el gol");
+      }
+
+      const result: ApiResponseFormat<boolean> = await response.json();
+
+      return result.succeeded;
+    } catch (error) {
+      console.error("Error en goalService:", error);
+      throw error;
+    }
+  },
 };

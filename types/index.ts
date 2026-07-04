@@ -68,7 +68,9 @@ export interface GoalReadDTO {
   playerName: string;
   playerGoals: number;
   isPenalty: boolean;
+  isFreeKick: boolean;
   assistedByPlayerId: number;
+  assistedByPlayerName: string;
   matchDate: string;
 }
 
