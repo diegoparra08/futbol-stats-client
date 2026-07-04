@@ -33,6 +33,12 @@ export default function Home() {
           >
              Comparar Jugadores
           </Link>
+          <Link 
+            href="/goals" 
+            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl transition-all border border-slate-700 flex items-center justify-center gap-2"
+          >
+             Historial de Goles
+          </Link>
         </div>
       </div>
     </div>
