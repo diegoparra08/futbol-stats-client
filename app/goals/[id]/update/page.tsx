@@ -1,7 +1,7 @@
 import Link from "next/link";
 import GoalForm from "@/components/goalForm"; 
 import { API_BASE_URL } from "@/services/api";
-import goalService from "@/services/goalServices";
+import { goalService } from "@/services/goalServices";
 
 interface PageProps {
   params: Promise<{ id: string }>;    
