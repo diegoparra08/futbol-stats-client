@@ -50,6 +50,28 @@ export const goalService = {
     }
   },
 
+  getGoalById: async (id: number): Promise<GoalReadDTO> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Goal/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al conectar con la API");
+      }
+    
+      const result: ApiResponseFormat<GoalReadDTO> = await response.json();
+      return result.data || result;
+    } catch (error) {
+      console.error("Error en goalService:", error);
+      throw error;
+    }
+  },
+
   updateGoal: async (id: number, payload: GoalUpdateDTO): Promise<boolean> => {
     try {
       const response = await fetch(`${API_BASE_URL}/api/Goal/${id}`, {

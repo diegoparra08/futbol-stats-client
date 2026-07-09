@@ -49,11 +49,11 @@ const [isPenalty, setIsPenalty] = useState<boolean>(() => initialData?.isPenalty
 const [isFreeKick, setIsFreeKick] = useState<boolean>(() => initialData?.isFreeKick ?? false);
 const [submitting, setSubmitting] = useState<boolean>(false);
 
+console.log("estados del formulario", playerId, minute, assistedByPlayerId, isPenalty, isFreeKick);
 
 const handleSubmit = async (e: React.SyntheticEvent) => {
   e.preventDefault();
 
-  // Configuración de estilo idéntica a la que sí funciona
   const toastConfig = {
     duration: 3000,
     position: "top-right" as const,
@@ -109,6 +109,8 @@ const handleSubmit = async (e: React.SyntheticEvent) => {
           assistedByPlayerId: assistedByPlayerId > 0 ? assistedByPlayerId : null,
         };
 
+        console.log("bodyData", bodyData);
+
     const url = isEditMode
       ? `${API_BASE_URL}/api/Goal/${initialData?.id}`
       : `${API_BASE_URL}/api/Goal`;
@@ -122,7 +124,11 @@ const handleSubmit = async (e: React.SyntheticEvent) => {
     if (!response.ok) throw new Error();
 
     onSubmitSuccess?.();
-    router.push(`/matches/${matchId}`);
+    if (isEditMode) {
+      router.push(`/goals/`);
+    } else {
+      router.push(`/matches/${matchId}`);
+    }
     router.refresh();
 
   } catch (error) {

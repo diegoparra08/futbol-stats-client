@@ -42,6 +42,7 @@ export default function GoalCard({ goal, isAdmin = false, onDeleteSuccess }: Goa
     }
   };
 
+  
   //  Función para redireccionar al formulario en modo edición
   const handleEditRedirect = () => {
     // Redirige al GoalForm pasándole el ID del gol y el ID del partido. para traer solo los jugadores de ese partido
@@ -70,7 +71,7 @@ export default function GoalCard({ goal, isAdmin = false, onDeleteSuccess }: Goa
         <div className="min-w-0 flex-1 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div>
             <p className="text-sm font-bold text-slate-200 tracking-tight truncate">
-              {goal.playerName}
+              {goal.playerName} # {goal.id}
             </p>
             
             <div className="flex flex-wrap items-center gap-1.5 mt-0.5">

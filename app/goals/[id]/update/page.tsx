@@ -2,6 +2,7 @@ import Link from "next/link";
 import GoalForm from "@/components/goalForm"; 
 import { API_BASE_URL } from "@/services/api";
 import { goalService } from "@/services/goalServices";
+import { matchService } from "@/services/matchService";
 
 interface PageProps {
   params: Promise<{ id: string }>;    
@@ -33,14 +34,13 @@ export default async function GoalUpdatePage({ params, searchParams }: PageProps
   try {
     // se ejecutan ambas solicitudes para traer losjugadores y el gol
     const [matchResponse, goalResponse] = await Promise.all([
-
-      fetch(`${API_BASE_URL}/api/Match/${matchId}`, { cache: "no-store" }),
-      fetch(`${API_BASE_URL}/api/Goal/${id}`, { cache: "no-store" })
+      matchService.getMatchById(Number(matchId)),
+      goalService.getGoalById(Number(id))
     ]);
-console.log(" id partido y gol",matchResponse, goalResponse);
+
     // Procesa los jugadores del partido
-    if (matchResponse.ok) {
-      const matchData: MatchLineupResponse = await matchResponse.json();
+    if (matchResponse) {
+      const matchData: MatchLineupResponse = matchResponse;
       const details = matchData.data?.matchDetails || matchData.matchDetails || [];
       playersOptions = details.map((d) => ({
         playerId: d.playerId,
@@ -49,10 +49,10 @@ console.log(" id partido y gol",matchResponse, goalResponse);
     }
 
     // Procesa la información vieja del gol para mandarla al formulario
-    if (goalResponse.ok) {
-      const goalData = await goalResponse.json();
-      const goal = goalData.data || goalData;
-
+    if (goalResponse) {
+      
+      const goal = goalResponse;
+    
       initialGoalData = {
         id: Number(id),
         playerId: goal.playerId,
