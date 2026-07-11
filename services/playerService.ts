@@ -27,6 +27,28 @@ export const playerService = {
     }
   },
 
+  getById: async (id: number): Promise<PlayerReadDTO | null> => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/Player/${id}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        cache: "no-store", 
+      });
+      if (!response.ok) {
+        throw new Error("Error al conectar con la API");
+      }
+
+      const result: ApiResponseFormat<PlayerReadDTO> = await response.json();
+
+      return result.data || null;
+    } catch (error) {
+      console.error("Error en playerService:", error);
+      throw error;
+    }
+  },
+
   getPlayerStats: async (id: number): Promise<PlayerStatsReadDTO> => {
     const response = await fetch(`${API_BASE_URL}/api/Player/${id}/stats`);
     if (!response.ok) {

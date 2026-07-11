@@ -195,6 +195,13 @@ export default function PlayerCard({
                   Editar Datos Basicos
                 </Link>
 
+                <Link
+                  href={`/players/${player.id}/rate`}
+                  className="block bg-slate-950/80 border border-slate-800/40 p-2.5 rounded-lg hover:border-slate-700 transition-colors text-slate-300 hover:text-slate-200 text-sm font-bold text-center"
+                >
+                  Calificar Jugador
+                </Link>
+
                 {/* Boton Borrar condicional */}
                 {isAdmin && (
                   <button

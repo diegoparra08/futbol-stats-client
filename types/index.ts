@@ -10,12 +10,12 @@ export interface ApiResponseFormat<T> {
 }
 
 export interface PlayerStatsReadDTO {
-    playerId: number;
-    matchesPlayed: number;
-    goals: number;
-    assists: number;
+  playerId: number;
+  matchesPlayed: number;
+  goals: number;
+  assists: number;
 }
-// El DTO de tu jugador 
+// El DTO de tu jugador
 export interface PlayerReadDTO {
   id: number;
   name: string;
@@ -31,7 +31,7 @@ export interface PlayerReadDTO {
   avgShooting: number;
   avgPassing: number;
   avgDribbling: number;
-  avgDefending  : number;
+  avgDefending: number;
   avgPhysicality: number;
   avgStrength: number;
   avgGoalkeeping: number;
@@ -43,12 +43,11 @@ export interface PlayerUpdateDTO {
   photoUrl: string;
   preferredFoot: "Left" | "Right";
   positions: number[];
- 
 }
 
 export interface PlayerCreateDTO extends PlayerUpdateDTO {
-age: number;
-height: number;
+  age: number;
+  height: number;
 }
 
 export interface MatchDetailReadDto {
@@ -75,21 +74,20 @@ export interface GoalReadDTO {
 }
 
 export interface MatchReadDTO {
-  id: number,
-  matchDate: string,
-  location: string,
-  teamAScore: number,
-  teamBScore: number,
-  status: string,
-  matchDetails: MatchDetailReadDto[],
-  goals: GoalReadDTO[]
+  id: number;
+  matchDate: string;
+  location: string;
+  teamAScore: number;
+  teamBScore: number;
+  status: string;
+  matchDetails: MatchDetailReadDto[];
+  goals: GoalReadDTO[];
 }
 
 export interface MatchDetailCreateDto {
   playerId: number;
-  team: 0 | 1;  // 0 = Equipo A, 1 = Equipo B
+  team: 0 | 1; // 0 = Equipo A, 1 = Equipo B
 }
-
 
 export interface MatchUpdateDTO {
   matchDate: string;
@@ -105,7 +103,7 @@ export interface MatchSaveDTO extends MatchUpdateDTO {
 
 export interface PlayerStatUpdateInput {
   playerId: number;
-  playerName?: string; 
+  playerName?: string;
   team: 0 | 1;
   recoveries: number;
   tackles: number;
@@ -116,7 +114,7 @@ export interface MatchStatsUpdateDTO {
   playersStats: PlayerStatUpdateInput[];
 }
 
-export interface GoalCreateDTO extends GoalUpdateDTO{
+export interface GoalCreateDTO extends GoalUpdateDTO {
   matchId: number;
 }
 
@@ -127,3 +125,28 @@ export interface GoalUpdateDTO {
   isFreeKick: boolean;
   assistedByPlayerId: number;
 }
+
+export interface RatingUpdateDTO {
+
+  goalkeeping: number;
+  strength: number;
+  physicality: number;
+  defending: number;
+  dribbling: number;
+  passing: number;
+  shooting: number;
+  speed: number;
+}
+
+export interface RatingCreateDTO extends RatingUpdateDTO {
+  playerId: number;
+}
+
+export interface RatingReadDTO extends RatingCreateDTO {
+  id: number;
+  playerName: string;
+  userId: number;
+  userName?: string;  
+}
+
+
