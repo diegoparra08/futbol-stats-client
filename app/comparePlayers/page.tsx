@@ -4,7 +4,9 @@ import { useEffect, useState } from "react";
 import { PlayerReadDTO, PlayerStatsReadDTO } from "@/types";
 import { playerService } from "@/services/playerService";
 import Link from "next/link";
+import Image from 'next/image';
 import CompareCard from "@/components/compareCard";
+
 
 interface playerDetails {
   player: PlayerReadDTO;
@@ -91,11 +93,20 @@ export default function ComparePlayers() {
 <div className="grid grid-cols-1 md:flex md:items-center md:justify-between gap-4 w-full border-b border-slate-800/40 pb-4 mb-8">
   
   {/* TITLE */}
-  <div className="w-1/2 md:w-auto text-left">
-    <h1 className="text-2xl font-black mb-6 uppercase tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-500">
-       Comparar Jugadores
-    </h1>
-  </div>
+ <div className="flex items-center gap-3 w-full md:w-auto text-left">
+  <Link href="/" className="shrink-0">  
+    <Image 
+      src="/icon.svg" 
+      alt="Inicio" 
+      width={40} 
+      height={40} 
+      className="w-10 h-10 sm:w-12 sm:h-12" // Define tamaño real con Tailwind
+    />
+  </Link>
+  <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-transparent bg-clip-text bg-linear-to-r from-emerald-400 to-teal-500">
+    Comparar Jugadores
+  </h1>
+</div>
 
   {/* BUTTON VOLVER */}
   <div className="w-1/2 md:w-auto flex justify-start md:justify-end">
@@ -103,7 +114,7 @@ export default function ComparePlayers() {
       href="/"
       className="inline-flex items-center cursor-pointer gap-3 bg-slate-950/60 px-4 py-2 rounded-lg border border-slate-800 select-none hover:border-slate-700 transition-colors text-slate-400 font-medium mb-1 hover:text-slate-300"
     >
-      ⬅️Inicio
+      ⬅️Inicio 
     </Link>
   </div>
 

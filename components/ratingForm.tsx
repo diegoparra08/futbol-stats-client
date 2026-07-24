@@ -1,25 +1,38 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
 import StatSlider from "@/components/statSlider";
 import { ratingService } from "@/services/ratingService";
+import { RatingReadDTO } from "@/types";
 
-export default function RatingForm({ playerId }: { playerId: number }) {
-  const router = useRouter(); // Instanciamos el enrutador
+interface RatingFormProps {
+  playerId: number;
+  initialData?: RatingReadDTO;
+  onSuccess?: () => void;
+}
+
+export default function RatingForm({
+  playerId,
+  initialData,
+  onSuccess,
+}: RatingFormProps) {
+  const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const isEditMode = !!initialData;
 
-  const [stats, setStats] = useState({
-    speed: 70,
-    shooting: 70,
-    passing: 70,
-    dribbling: 70,
-    defending: 70,
-    physicality: 70,
-    strength: 70,
-    goalkeeping: 50,
-  });
+  //se inicializa con los datos existentes o en 70 por si es creacion nueva
+  const [stats, setStats] = useState(() => ({
+    speed: initialData?.speed ?? 70,
+    shooting: initialData?.shooting ?? 70,
+    passing: initialData?.passing ?? 70,
+    dribbling: initialData?.dribbling ?? 70,
+    defending: initialData?.defending ?? 70,
+    physicality: initialData?.physicality ?? 70,
+    strength: initialData?.strength ?? 70,
+    goalkeeping: initialData?.goalkeeping ?? 50,
+  }));
 
   const handleStatChange = (statName: string, newValue: number) => {
     setStats((prev) => ({ ...prev, [statName]: newValue }));
@@ -32,57 +45,83 @@ export default function RatingForm({ playerId }: { playerId: number }) {
     setIsSubmitting(true);
 
     try {
-      const result = await ratingService.createRating({
-        playerId,
-        ...stats,
-      });
-
-      if (result && result.succeeded) {
-        toast.success("¡Calificación guardada con éxito!", {
-          duration: 3000,
-          position: "top-center",
+      //inicia modo edición
+      if (isEditMode && initialData) {
+        const succeeded = await ratingService.updateRating(initialData.id, {  
+          ...stats,
         });
 
-        setTimeout(() => {
-          router.push("/players");
-        }, 1500);
+        if (succeeded) {
+          toast.success("¡Calificación actualizada con éxito!", {
+            duration: 2000,
+            position: "top-center",
+          });
+
+          if (onSuccess) {
+            setTimeout(() => {
+              onSuccess();
+            }, 1500);
+          } else {
+            setTimeout(() => {
+              router.push("/players");
+            }, 1500);
+          }
+        } else {
+          throw new Error("No se pudo actualizar la calificación.");
+        }
       } else {
-        throw new Error(
-          result?.message || "No se pudo procesar la calificación.",
-        );
+        //inicia creación
+        const result = await ratingService.createRating({
+          playerId,
+          ...stats,
+        });
+
+        if (result && result.succeeded) {
+          toast.success("¡Calificación guardada con éxito!", {
+            duration: 3000,
+            position: "top-center",
+          });
+
+          if (onSuccess) {
+            setTimeout(() => {
+              onSuccess();
+            }, 500);
+          } else {
+            setTimeout(() => {
+              router.push("/players");
+            }, 1500);
+          }
+        } else {
+          throw new Error(
+            result?.message || "No se pudo procesar la calificación."
+          );
+        }
       }
     } catch (error: unknown) {
-      //mensaje por defecto de respaldo
       let message = "Por favor intenta más tarde.";
 
       if (error instanceof Error) {
         message = error.message;
       }
 
-      // error por regla de 15 días para recalificar
       if (message.includes("Debes esperar")) {
         toast.error(`Recuerda:\n${message}`, {
-          duration: 5000, 
+          duration: 5000,
           position: "top-center",
           style: {
-            background: "#1e293b", 
+            background: "#1e293b",
             color: "#f8fafc",
-            border: "1px solid #f59e0b", 
+            border: "1px solid #f59e0b",
           },
         });
-        
-        setTimeout(() => {
-          router.push("/players");
-        }, 1500);
       } else {
-        // este es para error genérico o técnico
         toast.error(`Error:\n${message}`, {
           duration: 4000,
           position: "top-center",
           style: {
             background: "#1e293b",
             color: "#f8fafc",
-            border: "1px solid #ef4444", 
+            border: "1px solid #ef4444",
           },
         });
       }
@@ -93,11 +132,9 @@ export default function RatingForm({ playerId }: { playerId: number }) {
 
   return (
     <>
-      
       <Toaster />
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* slides para agregar la calificaci{on} */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <StatSlider
             label="Velocidad"
@@ -150,7 +187,11 @@ export default function RatingForm({ playerId }: { playerId: number }) {
               : "bg-emerald-500 hover:bg-emerald-600 text-slate-950"
           }`}
         >
-          {isSubmitting ? "Guardando..." : "Guardar Calificación"}
+          {isSubmitting
+            ? "Guardando..."
+            : isEditMode
+              ? "Actualizar Calificación"
+              : "Guardar Calificación"}
         </button>
       </form>
     </>

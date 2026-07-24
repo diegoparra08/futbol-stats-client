@@ -39,6 +39,12 @@ export default function Home() {
           >
              Historial de Goles
           </Link>
+           <Link 
+            href="/ratings" 
+            className="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 font-medium py-3 px-4 rounded-xl transition-all border border-slate-700 flex items-center justify-center gap-2"
+          >
+             Mis Ratings
+          </Link>
         </div>
       </div>
     </div>

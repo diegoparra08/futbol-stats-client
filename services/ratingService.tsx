@@ -34,9 +34,10 @@ export const ratingService = {
   },
 
   getPlayerRatingsOwn: async (playerId: number): Promise<RatingReadDTO[]> => {
+    console.log("Calling getPlayerRatingsOwn with playerId:", playerId);
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/Rating/player${playerId}/own`,
+        `${API_BASE_URL}/api/Rating/player/${playerId}/own`,
         {
           method: "GET",
           headers: {
@@ -49,9 +50,8 @@ export const ratingService = {
       if (!response.ok) {
         throw new Error("Error al conectar con la API");
       }
-
       const result: ApiResponseFormat<RatingReadDTO[]> = await response.json();
-
+      console.log("Result from getPlayerRatingsOwn:", result.data);
       return result.data;
     } catch (error) {
       console.error("Error en ratingService:", error);
