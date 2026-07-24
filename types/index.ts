@@ -148,6 +148,7 @@ export interface RatingReadDTO extends RatingCreateDTO {
   userId: number;
   userName?: string;  
   createdAt : string;
+  overallRating: number;  
 }
 
 

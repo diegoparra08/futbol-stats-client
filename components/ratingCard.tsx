@@ -9,27 +9,7 @@ interface RatingCardProps {
 
 export default function RatingCard({ rating, onEdit }: RatingCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  // Calculamos el promedio general de las estadísticas (excluyendo portería si es 0, o promediando todas)
-  const calculateOverall = (r: RatingReadDTO): number => {
-    const stats = [
-      r.speed,
-      r.shooting,
-      r.passing,
-      r.dribbling,
-      r.defending,
-      r.physicality,
-      r.strength,
-    ];
-    // Si tiene estadísticas de portero significativas, las incluimos en el promedio
-    if (r.goalkeeping > 10) {
-      stats.push(r.goalkeeping);
-    }
-    const sum = stats.reduce((acc, curr) => acc + curr, 0);
-    return Math.round(sum / stats.length);
-  };
-
-  const overall = calculateOverall(rating);
-
+     
   // Colores dinámicos según el promedio general estilo carta de juego
   const getOverallColorClass = (val: number) => {
     if (val < 60) return "bg-red-500/10 text-red-400 border-red-500/30";
@@ -64,8 +44,8 @@ export default function RatingCard({ rating, onEdit }: RatingCardProps) {
       >
         <div className="flex items-center gap-4">
           {/* Promedio General */}
-          <div className={`w-14 h-14 rounded-xl border flex flex-col items-center justify-center font-black text-xl tracking-tight ${getOverallColorClass(overall)}`}>
-            {overall}
+          <div className={`w-14 h-14 rounded-xl border flex flex-col items-center justify-center font-black text-xl tracking-tight ${getOverallColorClass(rating.overallRating)}`}>          
+            {Math.round(rating.overallRating || 0)}
             <span className="text-[9px] font-bold uppercase tracking-wider opacity-80 -mt-1">OVR</span>
           </div>
           

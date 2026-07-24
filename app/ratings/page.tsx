@@ -24,7 +24,6 @@ export default function MyRatingsPage() {
 
   // Estado para controlar qué calificación se está editando en el modal
   const [editingRating, setEditingRating] = useState<RatingReadDTO | null>(null);
-
   // Carga la lista de jugadores para el filtro al montar el componente
   useEffect(() => {
     let isMounted = true;

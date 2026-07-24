@@ -32,6 +32,7 @@ export default function RatingForm({
     physicality: initialData?.physicality ?? 70,
     strength: initialData?.strength ?? 70,
     goalkeeping: initialData?.goalkeeping ?? 50,
+    overallRating: initialData?.overallRating ?? 0,
   }));
 
   const handleStatChange = (statName: string, newValue: number) => {
