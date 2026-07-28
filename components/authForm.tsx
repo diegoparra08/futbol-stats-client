@@ -58,7 +58,7 @@ export default function AuthForm() {
         );
 
         setTimeout(() => {
-          router.push("/players");
+          router.push("/");
           router.refresh();
         }, 800);
       }

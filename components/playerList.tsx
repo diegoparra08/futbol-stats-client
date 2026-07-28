@@ -107,8 +107,8 @@ export default function PlayerList({ initialPlayers }: PlayerListProps) {
               className="sr-only peer"
             />
             <div className="relative w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full after:content-[''] after:absolute after:top-0.5 after:inset-s-0.5 after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500 peer-checked:after:bg-white peer-checked:after:border-white"></div>
-            <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">
-              {includeInactive ? "🚫 Viendo Retirados" : "🏃‍♂️ Solo Activos"}
+            <span className="text-xs font-medium text-slate-300 uppercase tracking-wider">             
+              Incluir Retirados
             </span>
           </label>
         </div>

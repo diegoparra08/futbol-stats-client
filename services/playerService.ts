@@ -6,7 +6,7 @@ import { API_BASE_URL } from "./api";
 export const playerService = {
   getAllPlayers: async (includeInactive: boolean = false): Promise<PlayerReadDTO[]> => {
     try {
-      // 2. Apuntamos a /Player (en singular, respetando tu controlador de C#)
+      // 
       const response = await fetch(`${API_BASE_URL}/api/Player?includeInactive=${includeInactive}`, {
         method: "GET",
         headers: {
