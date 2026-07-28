@@ -4,18 +4,17 @@ import {
   RatingReadDTO,
   RatingUpdateDTO,
 } from "@/types";
-import { API_BASE_URL, getAuthHeader } from "./api";
+
 
 export const ratingService = {
   getAllPlayerRatings: async (playerId: number): Promise<RatingReadDTO[]> => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/Rating/player${playerId}`,
+        `/api/ratings/player/${playerId}`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            ...getAuthHeader(), //aca viaja el token extraido de la sesion del usuario
           },
           cache: "no-store",
         },
@@ -36,12 +35,11 @@ export const ratingService = {
   getPlayerRatingsOwn: async (playerId: number): Promise<RatingReadDTO[]> => {
     try {
       const response = await fetch(
-        `${API_BASE_URL}/api/Rating/player/${playerId}/own`,
+        `/api/ratings/player/${playerId}/own`,
         {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            ...getAuthHeader(), //aca viaja el token extraido de la sesion del usuario
           },
           cache: "no-store",
         },
@@ -61,22 +59,18 @@ export const ratingService = {
 
 createRating: async (payload: RatingCreateDTO): Promise<ApiResponseFormat<boolean>> => {
   try {
-    const response = await fetch(`${API_BASE_URL}/api/Rating`, {
+    const response = await fetch(`/api/ratings`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...getAuthHeader(),
       },
       body: JSON.stringify(payload),
     });
 
-    //si es error se inicia una valiacion para extraer el mensaje de error del api
     if (!response.ok) {
       try {
       
         const errorJson = await response.json();
-        
-        // extrae la propiedad message para enviar el mensaje de error
         if (errorJson && errorJson.message) {
           throw new Error(errorJson.message);
         }
@@ -86,8 +80,6 @@ createRating: async (payload: RatingCreateDTO): Promise<ApiResponseFormat<boolea
           throw parseError;
         }
       }
-      
-      // Respaldo por si el backend llega a caer por completo sin responder JSON
       throw new Error(`Error en el servidor remoto (Código: ${response.status})`);
     }
 
@@ -102,11 +94,10 @@ createRating: async (payload: RatingCreateDTO): Promise<ApiResponseFormat<boolea
 
   updateRating: async (id: number, payload: RatingUpdateDTO): Promise<boolean> => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/Rating/${id}`, {
+      const response = await fetch(`/api/ratings/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
-          ...getAuthHeader(), //aca viaja el token extraido de la sesion del usuario
         },
         body: JSON.stringify(payload),
       });

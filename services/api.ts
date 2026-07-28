@@ -5,7 +5,7 @@ export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export const getAuthHeader = (): HeadersInit => {
   
-  const token = ""; 
+  const token = "Av-ITb1reR333bPQbsFUbblMMTty6YvSYesevyc"; 
 
   //en el futuro debo cambiar esto para que obtenga el token de la sesion actual
   // const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
