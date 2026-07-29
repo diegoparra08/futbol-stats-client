@@ -15,6 +15,13 @@ export default function MatchStatsForm({ matchId, onSubmitSuccess }: MatchStatsF
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [stats, setStats] = useState<PlayerStatUpdateInput[]>([]);
+  //este almacena el valor del jugador que inicia el swap y su nuevo equipo
+  const [swapSourcePlayer, setSwapSourcePlayer] = useState<{
+  player: PlayerStatUpdateInput;
+  targetTeam: 0 | 1;
+} | null>(null);
+//control del modal (abierto/cerrado)
+const [isSwapModalOpen, setIsSwapModalOpen] = useState(false);
 
 //se carga los jugadores actuales asignados al partido desde el backend
 useEffect(() => {
@@ -24,13 +31,13 @@ useEffect(() => {
       const data = await response.json();
       const match = data.data || data;
 
-      // Mapeo corregido según tu consola de desarrollo:
       const initialStats = match.matchDetails.map((detail: any) => ({
         playerId: detail.playerId,
         // Acceso directo a playerName en la raíz del objeto
         playerName: detail.playerName || `Jugador #${detail.playerId}`, 
         // Convesrion de string a número (0 / 1) 
         team: detail.team === "TeamA" ? 0 : 1, 
+        tacticalPositionIndex: detail.tacticalPositionIndex ?? 0,
         recoveries: detail.recoveries || 0,
         tackles: detail.tackles || 0,
         foulsCommitted: detail.foulsCommitted || 0,
@@ -64,11 +71,58 @@ useEffect(() => {
   };
 
   // cambiar de equipo a jugador.
-  const handleTeamChange = (playerId: number, newTeam: 0 | 1) => {
-    setStats((prev) =>
-      prev.map((player) => (player.playerId === playerId ? { ...player, team: newTeam } : player))
-    );
-  };
+  const handleTeamChange = (playerId: number, targetTeam: 0 | 1) => {
+  const sourcePlayer = stats.find((p) => p.playerId === playerId);
+  if (!sourcePlayer) return;
+
+  // Si selecciona el mismo equipo que ya tiene, no hacemos nada
+  if (sourcePlayer.team === targetTeam) return;
+
+  // Guardamos quién quiere cambiar y abrimos el modal para elegir la pareja
+  setSwapSourcePlayer({ player: sourcePlayer, targetTeam });
+  setIsSwapModalOpen(true);
+};
+
+const executeSwap = (targetPlayerId: number) => {
+  if (!swapSourcePlayer) return;
+
+  const { player: sourcePlayer, targetTeam } = swapSourcePlayer;
+
+  setStats((prevStats) => {
+    const targetPlayer = prevStats.find((p) => p.playerId === targetPlayerId);
+
+    if (!targetPlayer) return prevStats;
+
+    // Guardamos los índices tácticos originales
+    const sourceIndex = sourcePlayer.tacticalPositionIndex;
+    const targetIndex = targetPlayer.tacticalPositionIndex;
+
+    return prevStats.map((p) => {
+      // El jugador A cambia a targetTeam y toma la posición de B
+      if (p.playerId === sourcePlayer.playerId) {
+        return {
+          ...p,
+          team: targetTeam,
+          tacticalPositionIndex: targetIndex,
+        };
+      }
+      // El jugador B pasa al equipo original de A y toma la posición de A
+      if (p.playerId === targetPlayerId) {
+        return {
+          ...p,
+          team: sourcePlayer.team, // Regresa al equipo opuesto
+          tacticalPositionIndex: sourceIndex,
+        };
+      }
+      return p;
+    });
+  });
+
+  // Limpiamos y cerramos el modal
+  setIsSwapModalOpen(false);
+  setSwapSourcePlayer(null);
+  toast.success("¡Intercambio de equipo y posiciones realizado!");
+};
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -197,6 +251,62 @@ useEffect(() => {
       >
         {saving ? "Guardando Estadísticas..." : "Finalizar y Guardar Reporte"}
       </button>
+
+      {isSwapModalOpen && swapSourcePlayer && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 backdrop-blur-sm p-4">
+        <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 max-w-md w-full shadow-2xl space-y-4">
+          <div>
+            <h3 className="text-base font-bold text-slate-100">
+              Intercambiar Jugador de Equipo
+            </h3>
+            <p className="text-xs text-slate-400 mt-1">
+              Vas a mover a{" "}
+              <span className="font-semibold text-emerald-400">
+                {swapSourcePlayer.player.playerName}
+              </span>{" "}
+              al{" "}
+              <span className="font-semibold text-amber-400">
+                {swapSourcePlayer.targetTeam === 0 ? "Equipo A" : "Equipo B"}
+              </span>
+              . Elige el jugador que pasará al equipo contrario para tomar su posición táctica:
+            </p>
+          </div>
+
+          <div className="space-y-2 max-h-60 overflow-y-auto pr-1">
+            {stats
+              .filter((p) => p.team === swapSourcePlayer.targetTeam)
+              .map((candidate) => (
+                <button
+                  key={candidate.playerId}
+                  type="button"
+                  onClick={() => executeSwap(candidate.playerId)}
+                  className="w-full flex items-center justify-between p-3 bg-slate-950 hover:bg-emerald-950/40 border border-slate-800 hover:border-emerald-500/50 rounded-xl transition-all group text-left"
+                >
+                  <span className="text-xs font-semibold text-slate-200 group-hover:text-emerald-300">
+                    {candidate.playerName}
+                  </span>
+                  <span className="text-[10px] text-slate-500 bg-slate-900 border border-slate-800 px-2 py-0.5 rounded group-hover:border-emerald-500/30 font-mono">
+                    Posición #{candidate.tacticalPositionIndex}
+                  </span>
+                </button>
+              ))}
+          </div>
+
+          <div className="pt-2 flex justify-end">
+            <button
+              type="button"
+              onClick={() => {
+                setIsSwapModalOpen(false);
+                setSwapSourcePlayer(null);
+              }}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-lg transition-colors"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
     </form>
   );
 }

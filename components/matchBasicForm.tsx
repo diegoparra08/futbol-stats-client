@@ -98,27 +98,81 @@ export default function MatchBasicForm({
       return;
     }
 
-    setMatchFormData((prev) => {
-      const updatedDetails = [...prev.matchDetails];
+    // setMatchFormData((prev) => {
+    //   const updatedDetails = [...prev.matchDetails];
 
-      const existingIndex = updatedDetails.findIndex(
-        (d) =>
-          d.team === teamSide &&
-          updatedDetails.filter((x) => x.team === teamSide).indexOf(d) ===
-            index,
-      );
+    //   const existingIndex = updatedDetails.findIndex(
+    //     (d) =>
+    //       d.team === teamSide &&
+    //       updatedDetails.filter((x) => x.team === teamSide).indexOf(d) ===
+    //         index,
+    //   );
 
-      const newDetail: MatchDetailCreateDto = { playerId, team: teamSide };
+    //   const newDetail: MatchDetailCreateDto = { playerId, team: teamSide };
 
-      if (existingIndex >= 0) {
-        updatedDetails[existingIndex] = newDetail;
-      } else {
-        updatedDetails.push(newDetail);
+    //   if (existingIndex >= 0) {
+    //     updatedDetails[existingIndex] = newDetail;
+    //   } else {
+    //     updatedDetails.push(newDetail);
+    //   }
+
+    //   return { ...prev, matchDetails: updatedDetails };
+    // });
+
+   setMatchFormData((prev) => {
+    const updatedDetails = [...prev.matchDetails];
+
+    // Asignar el índice táctico si se juega con 8 o más jugadores
+    const positionIndex = playersPerTeam >= 8 ? index : null;
+
+    // Helper para comparar equipos soportando number (0/1) o string ("TeamA"/"TeamB")
+    const checkIsSameTeam = (teamVal: string | number) => {
+      if (typeof teamVal === "number") {
+        return teamVal === teamSide;
+      }
+      return teamVal === (teamSide === 0 ? "TeamA" : "TeamB");
+    };
+
+    // 2. Buscar si ya existe un detalle asignado a esta casilla/equipo
+    const existingIndex = updatedDetails.findIndex((d) => {
+      const isSameTeam = checkIsSameTeam(d.team);
+
+      // Si tiene índice táctico asignado, comparamos directamente por casilla
+      if (d.tacticalPositionIndex !== undefined && d.tacticalPositionIndex !== null) {
+        return isSameTeam && d.tacticalPositionIndex === index;
       }
 
-      return { ...prev, matchDetails: updatedDetails };
+      // De lo contrario, comparamos por posición relativa dentro del equipo
+      const teamItems = updatedDetails.filter((x) => checkIsSameTeam(x.team));
+      return isSameTeam && teamItems.indexOf(d) === index;
     });
+
+    if (existingIndex >= 0) {
+      // 3. MODO EDICIÓN: Preserva datos previos (goles, faltas, etc.)
+      const existingDetail = updatedDetails[existingIndex];
+
+      updatedDetails[existingIndex] = {
+        ...existingDetail,
+        playerId,
+        team: teamSide,
+        tacticalPositionIndex: positionIndex,
+      };
+    } else {
+      // 4. MODO CREACIÓN
+      const newDetail: MatchDetailCreateDto = {
+        playerId,
+        team: teamSide,
+        tacticalPositionIndex: positionIndex,
+      };
+
+      updatedDetails.push(newDetail);
+    }
+
+    return { ...prev, matchDetails: updatedDetails };
+  });
   };
+
+
 
   const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -151,7 +205,7 @@ export default function MatchBasicForm({
           location: matchFormData.location,
           matchDetails: cleanDetails,
         };
-
+console.log(createPayload);
         const response = await fetch(`${API_BASE_URL}/api/Match`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -413,14 +467,14 @@ export default function MatchBasicForm({
           </div>
           {/* Seccion de Tableros Tacticos */}
           {playersPerTeam >= 8 && (
-      <div className="my-6 w-full">
-        <FullTacticalBoard
-          playersPerTeam={playersPerTeam}
-          selectedDetails={matchFormData.matchDetails}
-          playersList={playersList}
-        />
-      </div>
-    )}
+            <div className="my-6 w-full">
+              <FullTacticalBoard
+                playersPerTeam={playersPerTeam}
+                selectedDetails={matchFormData.matchDetails}
+                playersList={playersList}
+              />
+            </div>
+          )}
         </div>
       )}
 

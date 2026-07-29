@@ -33,8 +33,8 @@ export default async function MatchPage({ params }: Props) {
 
   return (
     <main className="container mx-auto p-6 bg-slate-950 min-h-screen text-slate-100">
-      {/* Cabecera */}    
-       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 w-full">
+      {/* Cabecera */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 w-full">
         {/* Logo + Título y Logout en Móvil */}
         <div className="flex items-center justify-between gap-3 w-full md:w-auto">
           <div className="flex items-center gap-3">
@@ -49,7 +49,7 @@ export default async function MatchPage({ params }: Props) {
             </Link>
 
             <h1 className="text-xl sm:text-2xl font-black uppercase tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-500">
-             Detalles del Partido
+              Detalles del Partido
             </h1>
           </div>
 
@@ -190,7 +190,18 @@ export default async function MatchPage({ params }: Props) {
               ))}
           </div>
         </div>
-
+        {/* Renderiza el tablero solo si es un partido de 8 o más jugadores por equipo */}
+        {match.matchDetails.length >= 16 && (
+          <div className="mt-8">
+            <h3 className="text-lg font-semibold text-slate-200 mb-4 text-center">
+              Formaciones
+            </h3>
+            <FullTacticalBoard
+              playersPerTeam={match.matchDetails.length / 2}
+              selectedDetails={match.matchDetails}
+            />
+          </div>
+        )}
         {/* BARRAS DE ESTADÍSTICAS */}
         <div className="space-y-4">
           <div>
@@ -273,6 +284,7 @@ export default async function MatchPage({ params }: Props) {
 
 //Funcion que segrega las estadisticas y alineaciones por equipo
 import { MatchReadDTO, GoalReadDTO } from "@/types";
+import { FullTacticalBoard } from "@/components/fullTacticalBoard";
 
 export function processMatchData(match: MatchReadDTO) {
   //Alineaciones por equipo

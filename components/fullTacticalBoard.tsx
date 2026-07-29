@@ -3,42 +3,46 @@
 import React, { useState, useMemo } from "react";
 import { FORMATIONS_PRESETS, PositionCoordinate } from "@/types";
 
-interface PlayerReadDTO {
+export interface PlayerReadDTO {
   id: number;
   name: string;
 }
 
-interface MatchDetailReadDto {
+export interface MatchDetailReadDto {
   playerId: number;
+  playerName?: string; 
   team: string | number;
+  tacticalPositionIndex?: number | null;
 }
 
 interface FullTacticalBoardProps {
   playersPerTeam: number;
   selectedDetails: MatchDetailReadDto[];
-  playersList: PlayerReadDTO[];
+  playersList?: PlayerReadDTO[]; 
+  readOnly?: boolean; 
 }
 
 export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
   playersPerTeam,
   selectedDetails,
-  playersList,
+  playersList = [],
+  readOnly = false,
 }) => {
   const availableFormations = useMemo(
     () => FORMATIONS_PRESETS[playersPerTeam] || {},
-    [playersPerTeam]
+    [playersPerTeam],
   );
 
   const formationKeys = useMemo(
     () => Object.keys(availableFormations),
-    [availableFormations]
+    [availableFormations],
   );
 
   const [formationKeyTeamA, setFormationKeyTeamA] = useState<string>(
-    formationKeys[0] || ""
+    formationKeys[0] || "",
   );
   const [formationKeyTeamB, setFormationKeyTeamB] = useState<string>(
-    formationKeys[0] || ""
+    formationKeys[0] || "",
   );
 
   const validKeyA = availableFormations[formationKeyTeamA]
@@ -52,14 +56,23 @@ export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
   if (validKeyA !== formationKeyTeamA) setFormationKeyTeamA(validKeyA);
   if (validKeyB !== formationKeyTeamB) setFormationKeyTeamB(validKeyB);
 
-  const detailsA = selectedDetails.filter((d) => d.team === 0 || d.team === "TeamA");
-  const detailsB = selectedDetails.filter((d) => d.team === 1 || d.team === "TeamB");
-
-  const playersA = detailsA.map((d) => playersList.find((p) => p.id === d.playerId));
-  const playersB = detailsB.map((d) => playersList.find((p) => p.id === d.playerId));
+  const detailsA = selectedDetails.filter(
+    (d) => d.team === 0 || d.team === "TeamA",
+  );
+  const detailsB = selectedDetails.filter(
+    (d) => d.team === 1 || d.team === "TeamB",
+  );
 
   const positionsA: PositionCoordinate[] = availableFormations[validKeyA] || [];
   const positionsB: PositionCoordinate[] = availableFormations[validKeyB] || [];
+
+  // Helper para resolver el nombre del jugador
+  const getPlayerName = (detail?: MatchDetailReadDto) => {
+    if (!detail) return "Sin asignar";
+    if (detail.playerName) return detail.playerName;
+    const found = playersList.find((p) => p.id === detail.playerId);
+    return found ? found.name : `Jugador #${detail.playerId}`;
+  };
 
   return (
     <div className="bg-slate-900 border border-slate-800 rounded-2xl p-3 sm:p-5 shadow-2xl flex flex-col items-center w-full max-w-lg mx-auto">
@@ -67,11 +80,15 @@ export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
       <div className="w-full flex items-center justify-between mb-2.5 px-2 bg-slate-800/60 p-2 rounded-lg border border-slate-700/50">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-sm" />
-          <span className="font-bold text-slate-200 text-xs sm:text-sm">Team B</span>
+          <span className="font-bold text-slate-200 text-xs sm:text-sm">
+            Equipo B
+          </span>
         </div>
-        {formationKeys.length > 0 && (
+        {formationKeys.length > 0 && !readOnly && (
           <div className="flex items-center gap-2">
-            <label className="text-[11px] text-slate-400 font-medium">Esquema:</label>
+            <label className="text-[11px] text-slate-400 font-medium">
+              Esquema:
+            </label>
             <select
               value={validKeyB}
               onChange={(e) => setFormationKeyTeamB(e.target.value)}
@@ -102,11 +119,15 @@ export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-36 sm:w-44 h-16 sm:h-20 border-t-2 border-x-2 border-emerald-300/40 rounded-t-md pointer-events-none" />
         <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-16 sm:w-20 h-6 sm:h-7 border-t-2 border-x-2 border-emerald-300/30 rounded-t-md pointer-events-none" />
 
-        {/*TEAM B */}
+        {/* TEAM B */}
         {positionsB.map((pos, index) => {
-          const player = playersB[index];
+          const detail = detailsB.find(
+            (d) => d.tacticalPositionIndex === index,
+          );
+          const playerName = getPlayerName(detail);
+          const isAssigned = !!detail;
+
           const numericTop = parseFloat(pos.top.replace("%", ""));
-         
           const calculatedTop = `${((100 - numericTop) * 0.46).toFixed(2)}%`;
 
           return (
@@ -117,7 +138,7 @@ export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
             >
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] shadow-md transition-all ${
-                  player
+                  isAssigned
                     ? "bg-amber-500 text-slate-950 ring-2 ring-amber-300"
                     : "bg-slate-800/90 text-slate-400 border border-slate-600 border-dashed"
                 }`}
@@ -125,17 +146,21 @@ export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
                 {pos.label}
               </div>
               <span className="text-[9px] font-medium text-slate-100 bg-slate-950/85 px-1 py-0.5 rounded leading-none mt-0.5 max-w-17.5 truncate shadow text-center border border-slate-800">
-                {player ? player.name : "Sin asignar"}
+                {playerName}
               </span>
             </div>
           );
         })}
 
-        {/* TEAM A  */}
+        {/* TEAM A */}
         {positionsA.map((pos, index) => {
-          const player = playersA[index];
+          const detail = detailsA.find(
+            (d) => d.tacticalPositionIndex === index,
+          );
+          const playerName = getPlayerName(detail);
+          const isAssigned = !!detail;
+
           const numericTop = parseFloat(pos.top.replace("%", ""));
-          // Escalado para mitad inferior
           const calculatedTop = `${(54 + numericTop * 0.46).toFixed(2)}%`;
 
           return (
@@ -146,7 +171,7 @@ export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
             >
               <div
                 className={`w-6 h-6 rounded-full flex items-center justify-center font-bold text-[9px] shadow-md transition-all ${
-                  player
+                  isAssigned
                     ? "bg-emerald-500 text-slate-950 ring-2 ring-emerald-300"
                     : "bg-slate-800/90 text-slate-400 border border-slate-600 border-dashed"
                 }`}
@@ -154,22 +179,26 @@ export const FullTacticalBoard: React.FC<FullTacticalBoardProps> = ({
                 {pos.label}
               </div>
               <span className="text-[9px] font-medium text-slate-100 bg-slate-950/85 px-1 py-0.5 rounded leading-none mt-0.5 max-w-17.5 truncate shadow text-center border border-slate-800">
-                {player ? player.name : "Sin asignar"}
+                {playerName}
               </span>
             </div>
           );
         })}
       </div>
 
-      {/* Selector Team A  */}
+      {/* Selector Team A */}
       <div className="w-full flex items-center justify-between mt-2.5 px-2 bg-slate-800/60 p-2 rounded-lg border border-slate-700/50">
         <div className="flex items-center gap-2">
           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-sm" />
-          <span className="font-bold text-slate-200 text-xs sm:text-sm">Team A</span>
+          <span className="font-bold text-slate-200 text-xs sm:text-sm">
+            Equipo A
+          </span>
         </div>
-        {formationKeys.length > 0 && (
+        {formationKeys.length > 0 && !readOnly && (
           <div className="flex items-center gap-2">
-            <label className="text-[11px] text-slate-400 font-medium">Esquema:</label>
+            <label className="text-[11px] text-slate-400 font-medium">
+              Esquema:
+            </label>
             <select
               value={validKeyA}
               onChange={(e) => setFormationKeyTeamA(e.target.value)}

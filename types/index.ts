@@ -10,7 +10,7 @@ export interface PlayerStatsReadDTO {
   goals: number;
   assists: number;
 }
-// El DTO de tu jugador
+// El DTO del jugador
 export interface PlayerReadDTO {
   id: number;
   name: string;
@@ -49,6 +49,7 @@ export interface MatchDetailReadDto {
   playerId: number;
   playerName: string;
   team: string;
+  tacticalPositionIndex?: number| null;
   recoveries: number;
   tackles: number;
   foulsCommitted: number;
@@ -82,6 +83,7 @@ export interface MatchReadDTO {
 export interface MatchDetailCreateDto {
   playerId: number;
   team: 0 | 1; // 0 = Equipo A, 1 = Equipo B
+  tacticalPositionIndex?: number | null; 
 }
 
 export interface MatchUpdateDTO {
@@ -93,6 +95,7 @@ export interface MatchSaveDTO extends MatchUpdateDTO {
   matchDetails: {
     playerId: number;
     team: 0 | 1;
+    tacticalPositionIndex?: number | null;
   }[];
 }
 
@@ -100,6 +103,7 @@ export interface PlayerStatUpdateInput {
   playerId: number;
   playerName?: string;
   team: 0 | 1;
+  tacticalPositionIndex?: number | null;
   recoveries: number;
   tackles: number;
   foulsCommitted: number;
@@ -166,7 +170,6 @@ export interface PositionCoordinate {
 export type FormationPreset = Record<string, PositionCoordinate[]>;
 
 // formaciones predefinidas por número de jugadores
-// 8 v 8
 export const FORMATIONS_PRESETS: Record<number, FormationPreset> = {
   // 8 v 8
   8: {
