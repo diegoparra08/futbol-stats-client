@@ -5,6 +5,7 @@ import { matchService } from "@/services/matchService";
 import { API_BASE_URL } from "@/services/api";
 import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
+import { FullTacticalBoard } from "@/components/fullTacticalBoard";
 
 interface PlayerFromDB {
   id: number;
@@ -410,6 +411,16 @@ export default function MatchBasicForm({
               </div>
             </div>
           </div>
+          {/* Seccion de Tableros Tacticos */}
+          {playersPerTeam >= 8 && (
+      <div className="my-6 w-full">
+        <FullTacticalBoard
+          playersPerTeam={playersPerTeam}
+          selectedDetails={matchFormData.matchDetails}
+          playersList={playersList}
+        />
+      </div>
+    )}
         </div>
       )}
 

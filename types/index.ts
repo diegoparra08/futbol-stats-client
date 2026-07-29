@@ -1,8 +1,3 @@
-// types/index.ts
-
-import { isHmrRefresh } from "next/dist/server/app-render/work-unit-async-storage.external";
-
-// El formato estandar de respuestas de la API cuando trae datos viene el data cuando no viene vacio.
 export interface ApiResponseFormat<T> {
   data: T;
   message: string;
@@ -127,7 +122,6 @@ export interface GoalUpdateDTO {
 }
 
 export interface RatingUpdateDTO {
-
   goalkeeping: number;
   strength: number;
   physicality: number;
@@ -146,9 +140,182 @@ export interface RatingReadDTO extends RatingCreateDTO {
   id: number;
   playerName: string;
   userId: number;
-  userName?: string;  
-  createdAt : string;
-  overallRating: number;  
+  userName?: string;
+  createdAt: string;
+  overallRating: number;
 }
 
+export class ApiError extends Error {
+  status: number;
 
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+  }
+}
+
+// Tipos para las formaciones
+export interface PositionCoordinate {
+  id: string; // Identificador de la posición (ej: 'PO', 'DFC', 'DC')
+  label: string; // Etiqueta legible (ej: 'PO', 'DF', 'MC')
+  top: string; // Porcentaje de distancia desde arriba (base para Equipo A)
+  left: string; // Porcentaje de distancia desde la izquierda
+}
+
+export type FormationPreset = Record<string, PositionCoordinate[]>;
+
+// formaciones predefinidas por número de jugadores
+// 8 v 8
+export const FORMATIONS_PRESETS: Record<number, FormationPreset> = {
+  // 8 v 8
+  8: {
+    "3-3-1": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "DFI", label: "DFI", top: "68%", left: "20%" },
+      { id: "DFC", label: "DFC", top: "68%", left: "50%" },
+      { id: "DFD", label: "DFD", top: "68%", left: "80%" },
+      { id: "MCI", label: "MCI", top: "42%", left: "25%" },
+      { id: "MCC", label: "MCC", top: "42%", left: "50%" },
+      { id: "MCD", label: "MCD", top: "42%", left: "75%" },
+      { id: "DC", label: "DC", top: "16%", left: "50%" },
+    ],
+    "3-2-2": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "DFI", label: "DFI", top: "68%", left: "20%" },
+      { id: "DFC", label: "DFC", top: "68%", left: "50%" },
+      { id: "DFD", label: "DFD", top: "68%", left: "80%" },
+      { id: "MCI", label: "MC", top: "42%", left: "35%" },
+      { id: "MCD", label: "MC", top: "42%", left: "65%" },
+      { id: "DCI", label: "DC", top: "16%", left: "35%" },
+      { id: "DCD", label: "DC", top: "16%", left: "65%" },
+    ],
+    "3-2-1-1": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "DFI", label: "DFI", top: "68%", left: "20%" },
+      { id: "DFC", label: "DFC", top: "68%", left: "50%" },
+      { id: "DFD", label: "DFD", top: "68%", left: "80%" },
+      { id: "MCI", label: "MC", top: "46%", left: "35%" },
+      { id: "MCD", label: "MC", top: "46%", left: "65%" },
+      { id: "MO", label: "MP", top: "28%", left: "50%" },
+      { id: "DC", label: "DC", top: "12%", left: "50%" },
+    ],
+  },
+
+  // 9 v 9
+  9: {
+    "3-3-2": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "DFI", label: "DFC", top: "68%", left: "22%" },
+      { id: "DFC", label: "DFC", top: "68%", left: "50%" },
+      { id: "DFD", label: "DFC", top: "68%", left: "78%" },
+      { id: "MCI", label: "MC", top: "42%", left: "25%" },
+      { id: "MCC", label: "MC", top: "42%", left: "50%" },
+      { id: "MCD", label: "MC", top: "42%", left: "75%" },
+      { id: "DCI", label: "DC", top: "16%", left: "35%" },
+      { id: "DCD", label: "DC", top: "16%", left: "65%" },
+    ],
+    "4-3-1": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "LI", label: "LI", top: "66%", left: "15%" },
+      { id: "DFI", label: "DFC", top: "68%", left: "38%" },
+      { id: "DFD", label: "DFC", top: "68%", left: "62%" },
+      { id: "LD", label: "LD", top: "66%", left: "85%" },
+      { id: "MCI", label: "MC", top: "42%", left: "25%" },
+      { id: "MCC", label: "MC", top: "42%", left: "50%" },
+      { id: "MCD", label: "MC", top: "42%", left: "75%" },
+      { id: "DC", label: "DC", top: "16%", left: "50%" },
+    ],
+    "3-4-1": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "DFI", label: "DFC", top: "68%", left: "22%" },
+      { id: "DFC", label: "DFC", top: "68%", left: "50%" },
+      { id: "DFD", label: "DFC", top: "68%", left: "78%" },
+      { id: "MI", label: "MI", top: "42%", left: "15%" },
+      { id: "MCI", label: "MC", top: "44%", left: "38%" },
+      { id: "MCD", label: "MC", top: "44%", left: "62%" },
+      { id: "MD", label: "MD", top: "42%", left: "85%" },
+      { id: "DC", label: "DC", top: "16%", left: "50%" },
+    ],
+    "3-2-3-1": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "DFI", label: "DFC", top: "68%", left: "22%" },
+      { id: "DFC", label: "DFC", top: "68%", left: "50%" },
+      { id: "DFD", label: "DFC", top: "68%", left: "78%" },
+      { id: "MCD1", label: "MC", top: "50%", left: "38%" },
+      { id: "MCD2", label: "MC", top: "50%", left: "62%" },
+      { id: "EI", label: "EI", top: "28%", left: "20%" },
+      { id: "MO", label: "MP", top: "30%", left: "50%" },
+      { id: "ED", label: "ED", top: "28%", left: "80%" },
+      { id: "DC", label: "DC", top: "12%", left: "50%" },
+    ],
+    "3-2-1-2": [
+      { id: "PO", label: "PO", top: "92%", left: "50%" },
+      { id: "DFI", label: "DFC", top: "68%", left: "22%" },
+      { id: "DFC", label: "DFC", top: "68%", left: "50%" },
+      { id: "DFD", label: "DFC", top: "68%", left: "78%" },
+      { id: "MCD1", label: "MC", top: "48%", left: "38%" },
+      { id: "MCD2", label: "MC", top: "48%", left: "62%" },
+      { id: "MO", label: "MP", top: "30%", left: "50%" },
+      { id: "DCI", label: "DC", top: "14%", left: "35%" },
+      { id: "DCD", label: "DC", top: "14%", left: "65%" },
+    ],
+  },
+  // 10 v 10
+  10: {
+    "4-3-2": [
+      { id: "PO", label: "PO", top: "88%", left: "50%" },
+      { id: "LI", label: "LI", top: "70%", left: "15%" },
+      { id: "DFI", label: "DFC", top: "72%", left: "38%" },
+      { id: "DFD", label: "DFC", top: "72%", left: "62%" },
+      { id: "LD", label: "LD", top: "70%", left: "85%" },
+      { id: "MCI", label: "MC", top: "48%", left: "25%" },
+      { id: "MCC", label: "MC", top: "50%", left: "50%" },
+      { id: "MCD", label: "MC", top: "48%", left: "75%" },
+      { id: "DCI", label: "DC", top: "22%", left: "35%" },
+      { id: "DCD", label: "DC", top: "22%", left: "65%" },
+    ],
+    "3-4-2": [
+      { id: "PO", label: "PO", top: "88%", left: "50%" },
+      { id: "DFI", label: "DFC", top: "72%", left: "25%" },
+      { id: "DFC", label: "DFC", top: "74%", left: "50%" },
+      { id: "DFD", label: "DFC", top: "72%", left: "75%" },
+      { id: "MI", label: "MI", top: "48%", left: "15%" },
+      { id: "MCI", label: "MC", top: "50%", left: "38%" },
+      { id: "MCD", label: "MC", top: "50%", left: "62%" },
+      { id: "MD", label: "MD", top: "48%", left: "85%" },
+      { id: "DCI", label: "DC", top: "22%", left: "35%" },
+      { id: "DCD", label: "DC", top: "22%", left: "65%" },
+    ],
+  },
+
+  // 11 v 11
+  11: {
+    "4-3-3": [
+      { id: "PO", label: "PO", top: "88%", left: "50%" },
+      { id: "LI", label: "LI", top: "70%", left: "15%" },
+      { id: "DFI", label: "DFC", top: "72%", left: "38%" },
+      { id: "DFD", label: "DFC", top: "72%", left: "62%" },
+      { id: "LD", label: "LD", top: "70%", left: "85%" },
+      { id: "MCI", label: "MC", top: "48%", left: "28%" },
+      { id: "MCC", label: "MC", top: "52%", left: "50%" },
+      { id: "MCD", label: "MC", top: "48%", left: "72%" },
+      { id: "EI", label: "EI", top: "22%", left: "20%" },
+      { id: "DC", label: "DC", top: "20%", left: "50%" },
+      { id: "ED", label: "ED", top: "22%", left: "80%" },
+    ],
+    "4-4-2": [
+      { id: "PO", label: "PO", top: "88%", left: "50%" },
+      { id: "LI", label: "LI", top: "70%", left: "15%" },
+      { id: "DFI", label: "DFC", top: "72%", left: "38%" },
+      { id: "DFD", label: "DFC", top: "72%", left: "62%" },
+      { id: "LD", label: "LD", top: "70%", left: "85%" },
+      { id: "MI", label: "MI", top: "48%", left: "18%" },
+      { id: "MCI", label: "MC", top: "50%", left: "38%" },
+      { id: "MCD", label: "MC", top: "50%", left: "62%" },
+      { id: "MD", label: "MD", top: "48%", left: "82%" },
+      { id: "DCI", label: "DC", top: "22%", left: "35%" },
+      { id: "DCD", label: "DC", top: "22%", left: "65%" },
+    ],
+  },
+};

@@ -5,7 +5,7 @@ import Link from "next/link";
 import toast, { Toaster } from "react-hot-toast";
 import RatingCard from "@/components/ratingCard";
 import RatingForm from "@/components/ratingForm";
-import { RatingReadDTO } from "@/types";
+import { RatingReadDTO, ApiError } from "@/types";
 import { ratingService } from "@/services/ratingService";
 import { playerService } from "@/services/playerService";
 import Image from "next/image";
@@ -88,19 +88,21 @@ export default function MyRatingsPage() {
         if (!ignore) {
           setRatings(response || []);
         }
-      } catch (error: any) {
+      } catch (error) {
         if (!ignore) {
-         if (error?.status === 401 || error?.message?.includes("expirado")) {
-          toast.error("Tu sesión ha expirado. Por favor, inicia sesión de nuevo.");
-          
-          //  Redirigir al usuario después de 1.5 segundos al login
-          setTimeout(() => {
-            window.location.href = "/login"; // O router.push("/login");
-          }, 1500);
-        } else {
-          // Para cualquier otro tipo de error 
-          toast.error("Error al obtener las calificaciones de este jugador.");
-        }
+          console.error("Error al cargar calificaciones:", error);
+          if (error instanceof ApiError && error.status === 401) {
+            toast.error(
+              "Tu sesión ha expirado. Por favor, inicia sesión de nuevo.",
+            );
+
+            setTimeout(() => {
+              window.location.href = "/login";
+            }, 1500);
+          } else {
+            // Errores generales
+            toast.error("Error al obtener las calificaciones de este jugador.");
+          }
         }
       } finally {
         if (!ignore) {
@@ -145,48 +147,46 @@ export default function MyRatingsPage() {
 
       {/* Header */}
 
-  <div className="flex flex-col gap-4 mb-8 w-full">
-  
-  {/*titulo y lougout */}
-  <div className="flex items-center justify-between gap-4 w-full">
-    <div className="flex items-center gap-3 sm:gap-4 min-w-0">
-      <Link href="/" className="shrink-0">
-        <Image
-          src="/icon.svg"
-          alt="Inicio"
-          width={40}
-          height={40}
-          className="w-10 h-10 sm:w-12 sm:h-12"
-        />
-      </Link>
+      <div className="flex flex-col gap-4 mb-8 w-full">
+        {/*titulo y lougout */}
+        <div className="flex items-center justify-between gap-4 w-full">
+          <div className="flex items-center gap-3 sm:gap-4 min-w-0">
+            <Link href="/" className="shrink-0">
+              <Image
+                src="/icon.svg"
+                alt="Inicio"
+                width={40}
+                height={40}
+                className="w-10 h-10 sm:w-12 sm:h-12"
+              />
+            </Link>
 
-      <div className="min-w-0">
-        <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block truncate">
-          Centro de Rendimiento
-        </span>
-        <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-50 mt-0.5 truncate">
-          Mis Calificaciones
-        </h1>
+            <div className="min-w-0">
+              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider block truncate">
+                Centro de Rendimiento
+              </span>
+              <h1 className="text-xl sm:text-2xl font-black tracking-tight text-slate-50 mt-0.5 truncate">
+                Mis Calificaciones
+              </h1>
+            </div>
+          </div>
+
+          {/* Logout  */}
+          <div className="shrink-0">
+            <LogoutButton />
+          </div>
+        </div>
+
+        {/* boton ver jugadores */}
+        <div className="flex justify-start md:justify-end w-full">
+          <Link
+            href="/players"
+            className="inline-flex items-center justify-center gap-2 bg-slate-900 border border-slate-800/80 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:text-slate-100 hover:border-slate-700 transition-all w-full md:w-auto"
+          >
+            Ver Jugadores
+          </Link>
+        </div>
       </div>
-    </div>
-
-    {/* Logout  */}
-    <div className="shrink-0">
-      <LogoutButton />
-    </div>
-  </div>
-
-  {/* boton ver jugadores */}
-  <div className="flex justify-start md:justify-end w-full">
-    <Link
-      href="/players"
-      className="inline-flex items-center justify-center gap-2 bg-slate-900 border border-slate-800/80 px-4 py-2.5 rounded-xl text-sm font-semibold text-slate-300 hover:text-slate-100 hover:border-slate-700 transition-all w-full md:w-auto"
-    >
-      Ver Jugadores
-    </Link>
-  </div>
-
-</div>
 
       {/* filtro */}
       <div className="bg-slate-900/30 border border-slate-800/50 p-6 rounded-2xl backdrop-blur-sm mb-6">
